@@ -1,6 +1,6 @@
 Libidn NEWS -- History of user-visible changes.                 -*- outline -*-
 
-* Noteworthy changes in release ?.? (????-??-??) [?]
+* Noteworthy changes in release 1.40 (2022-06-20) [stable]
 
 ** lib: Bump STRINGPREP_VERSION to 1.40.
 It was mistakenly left at 1.38 in the 1.39 release.
