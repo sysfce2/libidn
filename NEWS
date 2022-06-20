@@ -1,6 +1,6 @@
 Libidn NEWS -- History of user-visible changes.                 -*- outline -*-
 
-* Noteworthy changes in release ?.? (????-??-??) [?]
+* Noteworthy changes in release 1.39 (2022-06-20) [stable]
 
 ** lib: Code detecting current locale broken since 1.36.
 The code always returned ASCII.  The precise cause is complicated to
