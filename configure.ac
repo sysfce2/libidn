@@ -56,6 +56,7 @@ AM_PATH_LISPDIR
 AM_GNU_GETTEXT([external])
 AM_GNU_GETTEXT_VERSION([0.19.3])
 
+AM_LANGINFO_CODESET
 if test "$am_cv_func_iconv" != "yes"; then
   AC_MSG_NOTICE([
 ***
