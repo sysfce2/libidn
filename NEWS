@@ -2,6 +2,12 @@ Libidn NEWS -- History of user-visible changes.                 -*- outline -*-
 
 * Noteworthy changes in release ?.? (????-??-??) [?]
 
+** lib: Code detecting current locale broken since 1.36.
+The code always returned ASCII.  The precise cause is complicated to
+track down but likely boils down to the new autotools/gettext
+bootstrapping sequence introduced in release 1.36.  Reported by Богдан
+Пилипенко <bogdan.pylypenko107@gmail.com>.
+
 ** maint: Java JAR archive no longer included in source tarball.
 
 ** Minor fixes: typos, makefiles, indentation, gnulib update, etc.
