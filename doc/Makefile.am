@@ -77,6 +77,8 @@ dist_man_MANS = idn.1 $(gdoc_MANS)
 MAINTAINERCLEANFILES = $(dist_man_MANS)
 
 idn.1: $(top_srcdir)/src/idn.c $(top_srcdir)/src/idn.ggo $(top_srcdir)/.version
+	$(MAKE) -C ../lib
+	$(MAKE) -C ../src
 	$(AM_V_GEN)$(HELP2MAN) \
 		--name="Internationalized Domain Names command line tool" \
 		--output=$@ $(top_builddir)/src/idn$(EXEEXT)
