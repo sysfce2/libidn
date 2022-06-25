@@ -45,12 +45,6 @@ doit (void)
 {
   const char *p;
 
-  if (debug)
-    printf ("stringprep_check_version %s PACKAGE_VERSION %s\n",
-	    stringprep_check_version (NULL), PACKAGE_VERSION);
-  if (!stringprep_check_version (PACKAGE_VERSION))
-    fail ("stringprep_check_version (%s) == NULL\n", PACKAGE_VERSION);
-
   /* Test success. */
 
   p = idna_strerror (0);

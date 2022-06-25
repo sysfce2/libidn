@@ -192,6 +192,7 @@
 /tests/tst_toascii64oob
 /tests/tst_toutf8
 /tests/tst_utf8crash
+/tests/tst_versions
 /windows/libidn-*-win??.zip
 /windows/libidn-*-win??.zip.sig
 /windows/tmp32
