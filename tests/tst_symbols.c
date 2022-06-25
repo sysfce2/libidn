@@ -191,6 +191,4 @@ doit (void)
   if (!(const void *) tld_strerror)
     fail ("tld_strerror");
 #endif
-
-  success ("symbols exists");
 }
