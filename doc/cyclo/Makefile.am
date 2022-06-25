@@ -16,8 +16,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-EXTRA_DIST = cyclo-$(PACKAGE).html
-
 vcurl = "https://git.savannah.gnu.org/gitweb/?p=$(PACKAGE).git;a=blob;f=lib/%FILENAME%;hb=HEAD"
 
 cyclo-$(PACKAGE).html: $(top_srcdir)/.version
