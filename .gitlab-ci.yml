@@ -93,6 +93,7 @@ Debian testing:
   - time make check V=1 || (find . -name test-suite.log -exec cat {} +; exit 1)
   - time make distcheck
   - make install
+  - apt-get install man
   - git clone --depth=1 https://salsa.debian.org/debian/libidn.git debian-libidn
   - debian-libidn/debian/tests/idn
   - debian-libidn/debian/tests/libidn
