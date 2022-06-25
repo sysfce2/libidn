@@ -1563,7 +1563,7 @@ jas@@latte:~$
 The simplest explanation is that you haven't installed the
 @samp{iconv} conversion tools.  You can find it as a standalone
 library in GNU Libiconv
-(@uref{http://www.gnu.org/software/libiconv/}).  On many GNU/Linux
+(@uref{https://www.gnu.org/software/libiconv/}).  On many GNU/Linux
 systems, this library is part of the system, but you may have to
 install additional packages (e.g., @samp{glibc-locale} for Debian) to
 be able to use it.
@@ -1777,7 +1777,7 @@ The TestIDNA program allows to test the IDNA implementation manually
 or against Simon Josefsson's test vectors.
 
 The test vectors can be found at the Libidn homepage,
-@url{http://www.gnu.org/software/libidn/}.
+@url{https://www.gnu.org/software/libidn/}.
 
 To test the transformation manually, use:
 

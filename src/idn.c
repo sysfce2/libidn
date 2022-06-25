@@ -14,7 +14,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  */
 
@@ -50,7 +50,7 @@
 #define GREETING \
   "Copyright 2002-2022 Simon Josefsson.\n"				 \
   "GNU Libidn is free software with ABSOLUTELY NO WARRANTY.  For more\n" \
-  "information about these matters, see <http://www.gnu.org/licenses/>.\n"
+  "information about these matters, see <https://www.gnu.org/licenses/>.\n"
 
 const char version_etc_copyright[] =
   /* Do *not* mark this string for translation.  %s is a copyright

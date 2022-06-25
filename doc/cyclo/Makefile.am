@@ -14,7 +14,7 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 EXTRA_DIST = cyclo-$(PACKAGE).html
 
@@ -27,7 +27,7 @@ cyclo-$(PACKAGE).html: $(top_srcdir)/.version
 		| LANG=C $(AWK) -f ${abs_top_srcdir}/build-aux/pmccabe2html \
 			-v lang=html -v name="$(PACKAGE_STRING)" \
 			-v vcurl=$(vcurl) \
-			-v url="http://www.gnu.org/software/$(PACKAGE)/" \
+			-v url="https://www.gnu.org/software/$(PACKAGE)/" \
 			-v css=${abs_top_srcdir}/build-aux/pmccabe.css) \
 		> tmp && \
 	mv tmp $@

@@ -25,7 +25,7 @@
 
    You should have received copies of the GNU General Public License and
    the GNU Lesser General Public License along with this program.  If
-   not, see <http://www.gnu.org/licenses/>. */
+   not, see <https://www.gnu.org/licenses/>. */
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -573,7 +573,7 @@ stringprep_profile (const char *in,
  * C++, Emacs Lisp, Python and Java.
  *
  * The project web page:\n
- * http://www.gnu.org/software/libidn/
+ * https://www.gnu.org/software/libidn/
  *
  * The software archive:\n
  * ftp://alpha.gnu.org/pub/gnu/libidn/

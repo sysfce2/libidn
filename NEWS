@@ -517,7 +517,7 @@ See doc/cyclo/.
 
 ** tests: New 'make coverage' command to generate code coverage reports.
 The output is created in doc/coverage/.  Requires the LCOV tools.  See
-http://www.gnu.org/software/libidn/coverage/ for a pre-generated copy.
+https://www.gnu.org/software/libidn/coverage/ for a pre-generated copy.
 
 ** Clarify copyright and license for gdoc, man pages, and C# port.
 
@@ -1040,7 +1040,7 @@ This was forgotten in the last release.
 ** Added functions to convert return codes to human readable text.
 
 ** Now using GNULib in command line front end (src/) for portability code.
-See <http://www.gnu.org/software/gnulib/> for more information on
+See <https://www.gnu.org/software/gnulib/> for more information on
 GNULib.  This should make the code easier to read and maintain.
 
 ** API and ABI is backwards compatible with the previous version.
