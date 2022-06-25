@@ -92,7 +92,7 @@ Debian testing:
   - time ./configure --enable-java || (cat config.log; exit 1)
   - time make check V=1 || (find . -name test-suite.log -exec cat {} +; exit 1)
   - time make distcheck
-  - git clone --depth=1 git@salsa.debian.org:debian/libidn.git debian-libidn
+  - git clone --depth=1 https://salsa.debian.org/debian/libidn.git debian-libidn
   - debian-libidn/debian/tests/idn
   - debian-libidn/debian/tests/libidn
   artifacts:
