@@ -2,6 +2,9 @@ Libidn NEWS -- History of user-visible changes.                 -*- outline -*-
 
 * Noteworthy changes in release ?.? (????-??-??) [?]
 
+** Bump LT_REVISION for new release.
+It was mistakenly left at the same value since 1.38.
+
 ** Add version number related self-checks.
 
 * Noteworthy changes in release 1.40 (2022-06-20) [stable]

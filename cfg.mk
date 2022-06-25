@@ -60,6 +60,9 @@ sc_codespell:
 		codespell -L tim,ede,wich `git ls-files|egrep -v '^doc/specifications/.*|doc/gdoc|fuzz/libidn_(stringprep|toascii|tounicode)_fuzzer.in/.*$$'`; \
 	fi
 
+sc_libtool_version_bump:
+	@git diff v$(PREV_VERSION).. | grep -q '^+AC_SUBST(LT'
+
 # Fuzz
 
 COVERAGE_CCOPTS ?= "-g --coverage"
