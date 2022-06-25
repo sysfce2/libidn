@@ -1,5 +1,5 @@
 --- ../gnulib/top/README-release	2021-01-06 19:46:44.493509128 +0100
-+++ README-release	2022-06-25 08:01:29.378870335 +0200
++++ README-release	2022-06-25 21:40:43.006038595 +0200
 @@ -2,13 +2,25 @@
  
  * Start from a clean, up-to-date git directory on "master":
@@ -61,8 +61,8 @@
 +  soon post.  Start with the template, $HOME/announce-libidn-X.Y
    that was just created by that "make" command.
  
-+* Increment STRINGPREP_VERSION in lib/stringprep.h for the next
-+  release.
++* Increment STRINGPREP_VERSION in lib/stringprep.h and LT_REVISION in
++  configure.ac for the next release.
 +
  Once all the builds and tests have passed,
  
