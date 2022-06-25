@@ -18,7 +18,7 @@
 
 EXTRA_DIST = cyclo-$(PACKAGE).html
 
-vcurl = "http://git.savannah.gnu.org/gitweb/?p=$(PACKAGE).git;a=blob;f=lib/%FILENAME%;hb=HEAD"
+vcurl = "https://git.savannah.gnu.org/gitweb/?p=$(PACKAGE).git;a=blob;f=lib/%FILENAME%;hb=HEAD"
 
 cyclo-$(PACKAGE).html: $(top_srcdir)/.version
 	$(AM_V_GEN)(cd ${top_srcdir}/lib && \
