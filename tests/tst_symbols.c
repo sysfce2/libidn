@@ -33,6 +33,8 @@
 
 #include "utils.h"
 
+#include <assert.h>
+
 static void
 assert_symbol_exists (const void *p)
 {
