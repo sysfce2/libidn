@@ -42,14 +42,14 @@ doit (void)
     }
 
   if (!stringprep_check_version (STRINGPREP_VERSION))
-    fail ("stringprep_check_version(%s) failed\n", STRINGPREP_VERSION);
+    fail ("stringprep_check_version(STRINGPREP_VERSION) failed\n");
 
   if (!stringprep_check_version (NULL))
     fail ("stringprep_check_version(NULL) failed\n");
 
 #ifdef PACKAGE_VERSION
   if (!stringprep_check_version (PACKAGE_VERSION))
-    fail ("stringprep_check_version (%s) == NULL\n", PACKAGE_VERSION);
+    fail ("stringprep_check_version (PACKAGE_VERSION) == NULL\n");
 #endif
 
   if (!stringprep_check_version ("0.0"))
