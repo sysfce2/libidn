@@ -57,18 +57,6 @@ AM_GNU_GETTEXT([external])
 AM_GNU_GETTEXT_VERSION([0.19.3])
 
 AM_LANGINFO_CODESET
-if test "$am_cv_func_iconv" != "yes"; then
-  AC_MSG_NOTICE([
-***
-
-Your system does not have iconv().  The iconv() function is not
-strictly required by the source code.  However, that may change in
-the future, unless you report that this may be a problem for you.
-
-Please report this to $PACKAGE_BUGREPORT.
-
-***])
-fi
 
 # For gnulib stuff in gl/.
 gl_INIT
@@ -234,7 +222,7 @@ AC_MSG_NOTICE([Summary of build options:
   LDFlags:           ${LDFLAGS}
   Documentation:     ${enable_doc}
   Library types:     Shared=${enable_shared}, Static=${enable_static}
-  Libiconv:          $am_cv_func_iconv $LTLIBICONV
+  Libiconv:          $am_func_iconv $LTLIBICONV
   Valgrind:          ${VALGRIND:-no}
   Version script:    $have_ld_version_script
   nl_langinfo:       $gl_cv_header_langinfo_codeset
