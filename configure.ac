@@ -222,10 +222,10 @@ AC_MSG_NOTICE([Summary of build options:
   LDFlags:           ${LDFLAGS}
   Documentation:     ${enable_doc}
   Library types:     Shared=${enable_shared}, Static=${enable_static}
+  nl_langinfo:       $gl_cv_header_langinfo_codeset
   iconv:             $am_cv_func_iconv_summary $LTLIBICONV
   Valgrind:          ${VALGRIND:-no}
   Version script:    $have_ld_version_script
-  nl_langinfo:       $gl_cv_header_langinfo_codeset
   TLD code:          $enable_tld
   Build Java port:   $enable_java
   Build C# port:     $enable_csharp
