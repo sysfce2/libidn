@@ -25,13 +25,10 @@ EXTRA_DIST = gdoc components.fig stamp-gdoc
 
 info_TEXINFOS = libidn.texi
 libidn_TEXINFOS = fdl-1.3.texi idn-help.texi
-libidn_TEXINFOS += texinfo.css example.txt example2.txt example3.txt example4.txt example5.txt
+libidn_TEXINFOS += example.txt example2.txt example3.txt example4.txt example5.txt
 libidn_TEXINFOS += $(gdoc_TEXINFOS)
 libidn_TEXINFOS += libidn-components.eps libidn-components.png	\
 			libidn-components.pdf
-
-AM_MAKEINFOHTMLFLAGS = $(AM_MAKEINFOFLAGS) \
-	--no-split --css-include=texinfo.css
 
 imagesdir = $(infodir)
 images_DATA = libidn-components.png
