@@ -32,7 +32,7 @@ EXTRA_DIST = cfg.mk maint.mk
 EXTRA_DIST += COPYING.LESSERv2 COPYING.LESSERv3 COPYINGv2 COPYINGv3
 
 ACLOCAL_AMFLAGS = -I lib/m4 -I gl/m4 -I lib/gl/m4 -I m4
-DISTCHECK_CONFIGURE_FLAGS = --enable-doc --enable-gtk-doc --disable-valgrind-tests
+AM_DISTCHECK_CONFIGURE_FLAGS = --enable-doc --enable-gtk-doc --disable-valgrind-tests
 
 EXTRA_DIST += FAQ libc/README libc/getaddrinfo-idn.txt libc/example.c	\
 	contrib/README contrib/idn-python/README			\
