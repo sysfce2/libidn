@@ -38,6 +38,7 @@ Coverity:
     refs:
       - master
       - coverity
+  allow_failure: true
   before_script:
   - apt-get update -qq -y
   - env DEBIAN_FRONTEND=noninteractive apt-get install -y -q curl
