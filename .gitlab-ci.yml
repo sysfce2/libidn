@@ -20,6 +20,15 @@ stages:
  - build
  - test
 
+.test:
+  artifacts:
+    expire_in: 2 weeks
+    when: always
+    paths:
+    - "*-*.tar.gz"
+    - ./*.log
+    - ./**/*.log
+
 Quick-Debian-testing:
   image: $CI_REGISTRY/libidn/build-images:libidn-quick-Debian-testing
   stage: quick
@@ -172,6 +181,21 @@ Ubuntu latest:
     paths:
     - ./*.log
     - tests/*.log
+
+B-clang:
+  extends: .test
+  image: silkeh/clang:15-bullseye
+  stage: build
+  before_script:
+  - apt-get update -qq
+  - apt-get install -qqy --no-install-recommends make git autoconf automake libtool gettext autopoint cvs texinfo texlive texlive-plain-generic texlive-extra-utils help2man gtk-doc-tools dblatex valgrind gengetopt transfig mono-mcs gperf default-jdk-headless
+  script:
+  - ./bootstrap --skip-po
+  - ./configure CC="clang-15 -std=gnu2x"
+  - make V=1
+  - make V=1 check VERBOSE=t
+  - git status
+  - git diff --exit-code
 
 Debian oldoldstable:
   image: debian:oldoldstable
