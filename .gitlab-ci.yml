@@ -30,14 +30,15 @@ stages:
     - ./**/*.log
 
 Quick-Debian-testing:
+  extends: .test
   image: $CI_REGISTRY/libidn/build-images:libidn-quick-Debian-testing
   stage: quick
   script:
   - time ./bootstrap --skip-po --no-git
-  - time ./configure --disable-doc || (cat config.log; exit 1)
+  - time ./configure --disable-doc
   - time make syntax-check
   - time make V=1
-  - time make check || (find . -name test-suite.log -exec cat {} +; exit 1)
+  - time make check VERBOSE=t V=1
 
 # https://www.synopsys.com/blogs/software-security/integrating-coverity-scan-with-gitlab-ci/
 Coverity:
@@ -78,17 +79,19 @@ sast:
 include:
 - template: Security/SAST.gitlab-ci.yml
 
-Quick-Alpine:
+Alpine:
+  extends: .test
   image: $CI_REGISTRY/libidn/build-images:libidn-quick-Alpine
-  stage: build # it wasn't very quick...
+  stage: build
   script:
   - time ./bootstrap --skip-po --no-git
-  - time ./configure --disable-doc || (cat config.log; exit 1)
+  - time ./configure --disable-doc
   - time make syntax-check
-  - time make V=1
-  - time make check || (find . -name test-suite.log -exec cat {} +; exit 1)
+  - time make V=1 VERBOSE=t
+  - time make check V=1 VERBOSE=t
 
 Debian11:
+  extends: .test
   image: $CI_REGISTRY/libidn/build-images:libidn-Debian11
   stage: build
   before_script:
@@ -96,91 +99,66 @@ Debian11:
   - env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq wget
   script:
   - time ./bootstrap --no-git
-  - time ./configure --enable-java || (cat config.log; exit 1)
+  - time ./configure --enable-java
   - time make syntax-check
-  - time make check V=1 || (find . -name test-suite.log -exec cat {} +; exit 1)
+  - time make check V=1 VERBOSE=t
   - time make dist
-  artifacts:
-    expire_in: 2 weeks
-    paths:
-    - libidn-*.tar.gz
 
 Debian10:
+  extends: .test
   image: $CI_REGISTRY/libidn/build-images:libidn-Debian10
   stage: build
   script:
   - time ./bootstrap --skip-po --no-git
-  - time ./configure --enable-java || (cat config.log; exit 1)
-  - time make check V=1 || (find . -name test-suite.log -exec cat {} +; exit 1)
+  - time ./configure --enable-java
+  - time make check V=1 VERBOSER=t
   - time make dist
-  artifacts:
-    expire_in: 2 weeks
-    paths:
-    - libidn-*.tar.gz
 
 Debian9:
+  extends: .test
   image: $CI_REGISTRY/libidn/build-images:libidn-Debian9
   stage: build
   script:
   - time ./bootstrap --skip-po --no-git
-  - time ./configure --enable-java || (cat config.log; exit 1)
-  - time make check V=1 || (find . -name test-suite.log -exec cat {} +; exit 1)
+  - time ./configure --enable-java
+  - time make check V=1 VERBOSE=t
   - time make dist
   - time make syntax-check
-  artifacts:
-    expire_in: 2 weeks
-    paths:
-    - libidn-*.tar.gz
 
 Debian testing:
+  extends: .test
   image: $CI_REGISTRY/libidn/build-images:libidn-Debian-testing
   stage: build
   script:
   - time ./bootstrap --skip-po --no-git
-  - time ./configure --enable-java || (cat config.log; exit 1)
-  - time make check V=1 || (find . -name test-suite.log -exec cat {} +; exit 1)
+  - time ./configure --enable-java
+  - time make check V=1 VERBOSE=t
   - time make distcheck
   - make install
   - env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq man
   - git clone --depth=1 https://salsa.debian.org/debian/libidn.git debian-libidn
   - debian-libidn/debian/tests/idn
   - debian-libidn/debian/tests/libidn
-  artifacts:
-    expire_in: 2 weeks
-    paths:
-    - libidn-*.tar.gz
 
 Fedora latest:
+  extends: .test
   image: $CI_REGISTRY/libidn/build-images:libidn-Fedora-latest
   stage: build
   script:
   - time ./bootstrap --skip-po --no-git
-  - time ./configure --enable-java || (cat config.log; exit 1)
-  - time make check V=1 || (find . -name test-suite.log -exec cat {} +; exit 1)
+  - time ./configure --enable-java
+  - time make check V=1 VERBOSE=t
   - time make distcheck
-  artifacts:
-    expire_in: 2 weeks
-    paths:
-    - libidn-*.tar.gz
 
 Ubuntu latest:
+  extends: .test
   image: $CI_REGISTRY/libidn/build-images:libidn-Ubuntu-latest
   stage: build
   script:
   - time ./bootstrap --skip-po --no-git
-  - time ./configure --enable-java || (cat config.log; exit 1)
-  - time make check V=1 || (find . -name test-suite.log -exec cat {} +; exit 1)
+  - time ./configure --enable-java
+  - time make check V=1 VERBOSE=t
   - time make distcheck
-  artifacts:
-    expire_in: 2 weeks
-    paths:
-    - libidn-*.tar.gz
-  artifacts:
-    expire_in: 2 weeks
-    when: on_failure
-    paths:
-    - ./*.log
-    - tests/*.log
 
 B-clang:
   extends: .test
@@ -193,11 +171,12 @@ B-clang:
   - ./bootstrap --skip-po
   - ./configure CC="clang-15 -std=gnu2x"
   - make V=1
-  - make V=1 check VERBOSE=t
+  - make check V=1 VERBOSE=t
   - git status
   - git diff --exit-code
 
 Debian oldoldstable:
+  extends: .test
   image: debian:oldoldstable
   stage: test
   needs: [Debian11]
@@ -209,10 +188,11 @@ Debian oldoldstable:
   - cd `ls -d libidn-* | grep -v tar.gz`
   - mkdir b
   - cd b
-  - time ../configure || (cat config.log; exit 1)
-  - time make check V=1 || (find . -name test-suite.log -exec cat {} +; exit 1)
+  - time ../configure
+  - time make check V=1 VERBOSE=t
 
 Alpine:
+  extends: .test
   image: alpine:latest
   stage: test
   needs: [Debian11]
@@ -222,10 +202,11 @@ Alpine:
   script:
   - tar xfz libidn-*.tar.gz
   - cd `ls -d libidn-* | grep -v tar.gz`
-  - time ./configure || (cat config.log; exit 1)
-  - time make check V=1 || (find . -name test-suite.log -exec cat {} +; exit 1)
+  - time ./configure
+  - time make check V=1 VERBOSE=t
 
 ArchLinux:
+  extends: .test
   image: archlinux:latest
   stage: test
   needs: [Debian11]
@@ -236,10 +217,11 @@ ArchLinux:
   - cd `ls -d libidn-* | grep -v tar.gz`
   - mkdir b
   - cd b
-  - time ../configure || (cat config.log; exit 1)
-  - time make check V=1 || (find . -name test-suite.log -exec cat {} +; exit 1)
+  - time ../configure
+  - time make check V=1 VERBOSE=t
 
 Fedora:
+  extends: .test
   image: fedora:latest
   stage: test
   needs: [Debian11]
@@ -248,10 +230,11 @@ Fedora:
   script:
   - tar xfz libidn-*.tar.gz
   - cd `ls -d libidn-* | grep -v tar.gz`
-  - time ./configure || (cat config.log; exit 1)
-  - time make check V=1 || (find . -name test-suite.log -exec cat {} +; exit 1)
+  - time ./configure
+  - time make check V=1 VERBOSE=t
 
 CentOS7:
+  extends: .test
   image: centos:7
   stage: test
   needs: [Debian11]
@@ -260,10 +243,11 @@ CentOS7:
   script:
   - tar xfa libidn-*.tar.gz
   - cd `ls -d libidn-* | grep -v tar.gz`
-  - time ./configure || (cat config.log; exit 1)
-  - time make check V=1 || (find . -name test-suite.log -exec cat {} +; exit 1)
+  - time ./configure
+  - time make check V=1 VERBOSE=t
 
 AlmaLinux:
+  extends: .test
   image: almalinux:8
   stage: test
   needs: [Debian11]
@@ -272,10 +256,11 @@ AlmaLinux:
   script:
   - tar xfa libidn-*.tar.gz
   - cd `ls -d libidn-* | grep -v tar.gz`
-  - time ./configure || (cat config.log; exit 1)
-  - time make check V=1 || (find . -name test-suite.log -exec cat {} +; exit 1)
+  - time ./configure
+  - time make check V=1 VERBOSE=t
 
 Ubuntu-12.04:
+  extends: .test
   image: ubuntu:12.04
   stage: test
   needs: [Debian11]
@@ -286,10 +271,11 @@ Ubuntu-12.04:
   script:
   - tar xfa libidn-*.tar.gz
   - cd `ls -d libidn-* | grep -v tar.gz`
-  - time ./configure || (cat config.log; exit 1)
-  - time make check V=1 || (find . -name test-suite.log -exec cat {} +; exit 1)
+  - time ./configure
+  - time make check V=1 VERBOSE=t
 
 Ubuntu-14.04:
+  extends: .test
   image: ubuntu:14.04
   stage: test
   needs: [Debian11]
@@ -299,10 +285,11 @@ Ubuntu-14.04:
   script:
   - tar xfa libidn-*.tar.gz
   - cd `ls -d libidn-* | grep -v tar.gz`
-  - time ./configure --disable-tld || (cat config.log; exit 1)
-  - time make check V=1 || (find . -name test-suite.log -exec cat {} +; exit 1)
+  - time ./configure --disable-tld
+  - time make check V=1 VERBOSE=t
 
 Ubuntu rolling:
+  extends: .test
   image: ubuntu:rolling
   stage: test
   needs: [Debian11]
@@ -312,15 +299,12 @@ Ubuntu rolling:
   script:
   - tar xfa libidn-*.tar.gz
   - cd `ls -d libidn-* | grep -v tar.gz`
-  - time ./configure || (cat config.log; exit 1)
-  - time make check V=1 || (find . -name test-suite.log -exec cat {} +; exit 1)
+  - time ./configure
+  - time make check V=1 VERBOSE=t
   - make distcheck
-  artifacts:
-    expire_in: 2 weeks
-    paths:
-    - libidn-*.tar.gz
 
 Mingw32:
+  extends: .test
   image: debian:latest
   stage: test
   needs: [Debian11]
@@ -334,10 +318,11 @@ Mingw32:
   - cd `ls -d libidn-* | grep -v tar.gz`
   - mkdir b
   - cd b
-  - time ../configure --host=i686-w64-mingw32 CC='i686-w64-mingw32-gcc -static-libgcc' || (cat config.log; exit 1)
-  - time make check V=1 || (find . -name test-suite.log -exec cat {} +; exit 1)
+  - time ../configure --host=i686-w64-mingw32 CC='i686-w64-mingw32-gcc -static-libgcc'
+  - time make check V=1 VERBOSE=t
 
 Mingw64:
+  extends: .test
   image: debian:latest
   stage: test
   needs: [Debian11]
@@ -350,10 +335,11 @@ Mingw64:
   - cd `ls -d libidn-* | grep -v tar.gz`
   - mkdir b
   - cd b
-  - time ../configure --host=x86_64-w64-mingw32 || (cat config.log; exit 1)
-  - time make check V=1 || (find . -name test-suite.log -exec cat {} +; exit 1)
+  - time ../configure --host=x86_64-w64-mingw32
+  - time make check V=1 VERBOSE=t
 
 Armcross:
+  extends: .test
   image: debian:latest
   stage: test
   needs: [Debian11]
@@ -366,18 +352,18 @@ Armcross:
   - cd `ls -d libidn-* | grep -v tar.gz`
   - mkdir b
   - cd b
-  - ../configure --host=arm-linux-gnueabi CFLAGS="-static --static" || (cat config.log; exit 1)
+  - ../configure --host=arm-linux-gnueabi CFLAGS="-static --static"
   - make V=1
   - file src/idn
   - LANG=C.UTF-8 qemu-arm src/idn --debug foo
-  - time make check V=1 || (find . -name test-suite.log -exec cat {} +; exit 1)
+  - time make check V=1 VERBOSE=t
 
 .pages:
   image: $CI_REGISTRY/libidn/build-images:libidn-Debian-testing
   stage: build
   script:
   - time ./bootstrap --skip-po --no-git
-  - time ./configure --enable-java --enable-gtk-doc --enable-gtk-doc-pdf || (cat config.log; exit 1)
+  - time ./configure --enable-java --enable-gtk-doc --enable-gtk-doc-pdf
   - time make V=1
   - mkdir -p public
   - rm -rf public/reference
