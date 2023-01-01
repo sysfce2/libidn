@@ -17,7 +17,7 @@
 
 manual_title = Internationalized Domain Names Library
 
-old_NEWS_hash = fa6ecaebb48291627e29068d3d61a4db
+old_NEWS_hash = f875130a6288e025caeb9a5e13ab12d5
 
 bootstrap-tools = gnulib,autoconf,automake,libtoolize,make,makeinfo,help2man,gperf,gengetopt,gtkdocize,tar,gzip
 
@@ -61,7 +61,7 @@ sc_codespell:
 	fi
 
 sc_libtool_version_bump:
-	@git diff v$(PREV_VERSION).. | grep -q '^+AC_SUBST(LT'
+	@git diff v$(PREV_VERSION).. | grep '^+AC_SUBST(LT' > /dev/null
 
 # Fuzz
 
