@@ -1,5 +1,5 @@
 /* stringprep.h --- Header file for stringprep functions.
-   Copyright (C) 2002-2022 Simon Josefsson
+   Copyright (C) 2002-2023 Simon Josefsson
 
    This file is part of GNU Libidn.
 

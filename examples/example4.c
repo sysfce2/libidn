@@ -1,5 +1,5 @@
 /* example4.c --- Example ToUnicode() code showing how to use Libidn.
- * Copyright (C) 2002-2022 Simon Josefsson
+ * Copyright (C) 2002-2023 Simon Josefsson
  *
  * This file is part of GNU Libidn.
  *

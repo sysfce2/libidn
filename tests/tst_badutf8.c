@@ -1,5 +1,5 @@
 /* tst_badutf8.c --- Self tests for malformed UTF-8 regressions.
- * Copyright (C) 2015-2022 Simon Josefsson
+ * Copyright (C) 2015-2023 Simon Josefsson
  *
  * This file is part of GNU Libidn.
  *
