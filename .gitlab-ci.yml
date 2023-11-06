@@ -175,9 +175,9 @@ B-clang:
   - git status
   - git diff --exit-code
 
-Debian oldoldstable:
+Debian10:
   extends: .test
-  image: debian:oldoldstable
+  image: debian:10-slim
   stage: test
   needs: [Debian11]
   before_script:
@@ -305,7 +305,7 @@ Ubuntu rolling:
 
 Mingw32:
   extends: .test
-  image: debian:latest
+  image: debian:12-slim
   stage: test
   needs: [Debian11]
   before_script:
@@ -323,7 +323,7 @@ Mingw32:
 
 Mingw64:
   extends: .test
-  image: debian:latest
+  image: debian:12-slim
   stage: test
   needs: [Debian11]
   before_script:
@@ -340,12 +340,12 @@ Mingw64:
 
 Armcross:
   extends: .test
-  image: debian:latest
+  image: debian:12-slim
   stage: test
   needs: [Debian11]
   before_script:
   - apt-get update -qq
-  - env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq make gcc-arm-linux-gnueabi qemu-user qemu-user-binfmt file
+  - env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq make gcc-arm-linux-gnueabi qemu-user qemu-user-binfmt file binfmt-support
   - update-binfmts --enable qemu-arm
   script:
   - tar xfz libidn-*.tar.gz
