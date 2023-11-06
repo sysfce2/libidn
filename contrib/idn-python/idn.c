@@ -18,7 +18,7 @@ static PyObject *IDNInvLengthError;
 #define onError(message) { PyErr_SetString(IDNError, message); free(message); return NULL; }
 
 static PyObject *
-idn2ace (PyObject * self, PyObject * args)
+idn2ace (PyObject *self, PyObject *args)
 {
   char *instr, *result;
   int rc;
@@ -48,7 +48,7 @@ idn2ace (PyObject * self, PyObject * args)
 }
 
 static PyObject *
-ace2idn (PyObject * self, PyObject * args)
+ace2idn (PyObject *self, PyObject *args)
 {
   char *instr, *result;
   int rc;

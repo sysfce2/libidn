@@ -239,7 +239,7 @@ static const gchar *const g_utf8_skip = utf8_skip_data;
  * Return value: the length of the string in characters
  **/
 static glong
-g_utf8_strlen (const gchar * p)
+g_utf8_strlen (const gchar *p)
 {
   glong len = 0;
 
@@ -267,7 +267,7 @@ g_utf8_strlen (const gchar * p)
  * Return value: the resulting character
  **/
 static gunichar
-g_utf8_get_char (const gchar * p)
+g_utf8_get_char (const gchar *p)
 {
   int i, mask = 0, len;
   gunichar result;
@@ -293,7 +293,7 @@ g_utf8_get_char (const gchar * p)
  * Return value: number of bytes written
  **/
 static int
-g_unichar_to_utf8 (gunichar c, gchar * outbuf)
+g_unichar_to_utf8 (gunichar c, gchar *outbuf)
 {
   /* If this gets modified, also update the copy in g_string_insert_unichar() */
   guint len = 0;
@@ -362,7 +362,7 @@ g_unichar_to_utf8 (gunichar c, gchar * outbuf)
  *               This value must be freed with g_free().
  **/
 static gunichar *
-g_utf8_to_ucs4_fast (const gchar * str, glong len, glong * items_written)
+g_utf8_to_ucs4_fast (const gchar *str, glong len, glong *items_written)
 {
   gunichar *result;
   gsize n_chars, i;
@@ -461,8 +461,8 @@ g_utf8_to_ucs4_fast (const gchar * str, glong len, glong * items_written)
  *               character.
  **/
 static gchar *
-g_ucs4_to_utf8 (const gunichar * str,
-		glong len, glong * items_read, glong * items_written)
+g_ucs4_to_utf8 (const gunichar *str,
+		glong len, glong *items_read, glong *items_written)
 {
   gint result_length;
   gchar *result = NULL;
@@ -567,7 +567,7 @@ err_out:
  * manual for more information.
  **/
 static void
-g_unicode_canonical_ordering (gunichar * string, gsize len)
+g_unicode_canonical_ordering (gunichar *string, gsize len)
 {
   gsize i;
   int swap = 1;
@@ -608,7 +608,7 @@ g_unicode_canonical_ordering (gunichar * string, gsize len)
  * only calculate the result_len; however, a buffer with space for three
  * characters will always be big enough. */
 static void
-decompose_hangul (gunichar s, gunichar * r, gsize * result_len)
+decompose_hangul (gunichar s, gunichar *r, gsize *result_len)
 {
   gint SIndex = s - SBase;
   gint TIndex = SIndex % TCount;
@@ -674,7 +674,7 @@ find_decomposition (gunichar ch, gboolean compat)
 
 /* L,V => LV and LV,T => LVT  */
 static gboolean
-combine_hangul (gunichar a, gunichar b, gunichar * result)
+combine_hangul (gunichar a, gunichar b, gunichar *result)
 {
   if (a >= LBase && a < LCount + LBase && b >= VBase && b < VCount + VBase)
     {
@@ -710,7 +710,7 @@ combine_hangul (gunichar a, gunichar b, gunichar * result)
   (((Char >> 8) > (COMPOSE_TABLE_LAST)) ? 0 : CI((Char) >> 8, (Char) & 0xff))
 
 static gboolean
-combine (gunichar a, gunichar b, gunichar * result)
+combine (gunichar a, gunichar b, gunichar *result)
 {
   gushort index_a, index_b;
 
@@ -765,7 +765,7 @@ combine (gunichar a, gunichar b, gunichar * result)
 }
 
 static gunichar *
-_g_utf8_normalize_wc (const gchar * str, gssize max_len, GNormalizeMode mode)
+_g_utf8_normalize_wc (const gchar *str, gssize max_len, GNormalizeMode mode)
 {
   gsize n_wc;
   gunichar *wc_buffer;
@@ -937,7 +937,7 @@ _g_utf8_normalize_wc (const gchar * str, gssize max_len, GNormalizeMode mode)
  *   valid UTF-8.
  **/
 static gchar *
-g_utf8_normalize (const gchar * str, gssize len, GNormalizeMode mode)
+g_utf8_normalize (const gchar *str, gssize len, GNormalizeMode mode)
 {
   gunichar *result_wc = _g_utf8_normalize_wc (str, len, mode);
   gchar *result = NULL;
@@ -1037,7 +1037,7 @@ stringprep_utf8_to_ucs4 (const char *str, ssize_t len, size_t *items_written)
  *               If an error occurs, %NULL will be returned.
  **/
 char *
-stringprep_ucs4_to_utf8 (const uint32_t * str, ssize_t len,
+stringprep_ucs4_to_utf8 (const uint32_t *str, ssize_t len,
 			 size_t *items_read, size_t *items_written)
 {
   return g_ucs4_to_utf8 (str, len, (glong *) items_read,
@@ -1095,7 +1095,7 @@ stringprep_utf8_nfkc_normalize (const char *str, ssize_t len)
  *   normalized form of @str.
  **/
 uint32_t *
-stringprep_ucs4_nfkc_normalize (const uint32_t * str, ssize_t len)
+stringprep_ucs4_nfkc_normalize (const uint32_t *str, ssize_t len)
 {
   char *p;
   uint32_t *result_wc;

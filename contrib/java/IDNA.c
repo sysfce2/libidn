@@ -2,7 +2,7 @@
 #include "IDNA.h"
 
 JNIEXPORT jstring JNICALL
-Java_IDNA_toAscii (JNIEnv * env, jobject obj, jstring jstr)
+Java_IDNA_toAscii (JNIEnv *env, jobject obj, jstring jstr)
 {
   const char *in;
   const char *out;

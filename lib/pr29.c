@@ -1244,7 +1244,7 @@ combinationclass (uint32_t c)
  *   implementations).
  **/
 int
-pr29_4 (const uint32_t * in, size_t len)
+pr29_4 (const uint32_t *in, size_t len)
 {
   size_t i, j, k, row;
 
@@ -1285,7 +1285,7 @@ pr29_4 (const uint32_t * in, size_t len)
  *   implementations).
  **/
 int
-pr29_4z (const uint32_t * in)
+pr29_4z (const uint32_t *in)
 {
   size_t len;
 

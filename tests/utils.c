@@ -107,7 +107,7 @@ binprint (const char *str, size_t len)
 }
 
 void
-ucs4print (const uint32_t * str, size_t len)
+ucs4print (const uint32_t *str, size_t len)
 {
   size_t i;
 
