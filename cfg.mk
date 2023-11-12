@@ -47,7 +47,7 @@ aximport:
 review-diff:
 	git diff `git describe --abbrev=0`.. \
 	| grep -v -e '^index' -e '^deleted file mode' -e '^new file mode' \
-	| filterdiff -p 1 -x 'build-aux/*' -x 'gl/*' -x 'lib/gl/*' -x 'po/*' -x 'maint.mk' -x '.gitignore' -x .gitlab-ci.yml -x '.x-sc*' -x ChangeLog -x GNUmakefile -x .prev-version -x autogen.sh -x autopull.sh -x bootstrap -x bootstrap-funclib.sh \
+	| filterdiff -p 1 -x 'build-aux/*' -x 'gl/*' -x 'lib/gl/*' -x 'po/*' -x 'maint.mk' -x '.gitignore' -x .gitlab-ci.yml -x '.x-sc*' -x ChangeLog -x GNUmakefile -x .prev-version -x bootstrap -x bootstrap-funclib.sh \
 	| less
 
 my-update-copyright:
