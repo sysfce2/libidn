@@ -17,20 +17,21 @@
 
 stages:
  - quick
- - build
- - test
+ - bootstrap
+ - tarball
 
-.test:
+default:
+  interruptible: true
   artifacts:
     expire_in: 2 weeks
     when: always
     paths:
-    - "*-*.tar.gz"
+    - "*.tar.gz"
     - ./*.log
+    - ./config.h
     - ./**/*.log
 
-Quick-Debian-testing:
-  extends: .test
+Q-Debian-testing:
   image: $CI_REGISTRY/libidn/build-images:libidn-mini-Debian-testing
   stage: quick
   script:
@@ -39,11 +40,20 @@ Quick-Debian-testing:
   - time make syntax-check
   - time make V=1
   - time make check VERBOSE=t V=1
+  - git diff --exit-code # nothing should change version controlled files
+
+# https://docs.gitlab.com/ee/user/application_security/sast/#customizing-the-sast-settings
+sast:
+  stage: quick
+  variables:
+    SAST_EXCLUDED_PATHS: gnulib
+include:
+- template: Security/SAST.gitlab-ci.yml
 
 # https://www.synopsys.com/blogs/software-security/integrating-coverity-scan-with-gitlab-ci/
 Coverity:
   image: $CI_REGISTRY/libidn/build-images:libidn-mini-Debian-testing
-  stage: build
+  stage: bootstrap
   only:
     refs:
       - master
@@ -71,29 +81,34 @@ Coverity:
     paths:
       - cov-int/*.txt
 
-# https://docs.gitlab.com/ee/user/application_security/sast/#customizing-the-sast-settings
-sast:
-  stage: quick
-  variables:
-    SAST_EXCLUDED_PATHS: gnulib
-include:
-- template: Security/SAST.gitlab-ci.yml
-
-Alpine:
-  extends: .test
-  image: $CI_REGISTRY/libidn/build-images:libidn-mini-Alpine
-  stage: build
+B-Alpine:
+  image: alpine:latest
+  stage: bootstrap
+  before_script:
+  - apk update
+  - apk add gcc make libc-dev git autoconf automake libtool gettext-dev gperf gengetopt patch coreutils
   script:
-  - time ./bootstrap --skip-po --no-git
+  - time ./bootstrap --skip-po
   - time ./configure --disable-doc
   - time make syntax-check
   - time make V=1 VERBOSE=t
   - time make check V=1 VERBOSE=t
+  - git diff --exit-code # nothing should change version controlled files
 
-Debian11:
-  extends: .test
-  image: $CI_REGISTRY/libidn/build-images:libidn-Debian11
-  stage: build
+B-Debian9:
+  image: $CI_REGISTRY/libidn/build-images:libidn-Debian9
+  stage: bootstrap
+  script:
+  - time ./bootstrap --skip-po --no-git
+  - time ./configure --enable-java
+  - time make check V=1 VERBOSE=t
+  - time make dist
+  - time make syntax-check
+  - git diff --exit-code # nothing should change version controlled files
+
+B-Debian12:
+  image: $CI_REGISTRY/libidn/build-images:libidn-Debian12
+  stage: bootstrap
   before_script:
   - apt-get update
   - env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq wget
@@ -103,32 +118,11 @@ Debian11:
   - time make syntax-check
   - time make check V=1 VERBOSE=t
   - time make dist
+  - git diff --exit-code # nothing should change version controlled files
 
-Debian10:
-  extends: .test
-  image: $CI_REGISTRY/libidn/build-images:libidn-Debian10
-  stage: build
-  script:
-  - time ./bootstrap --skip-po --no-git
-  - time ./configure --enable-java
-  - time make check V=1 VERBOSER=t
-  - time make dist
-
-Debian9:
-  extends: .test
-  image: $CI_REGISTRY/libidn/build-images:libidn-Debian9
-  stage: build
-  script:
-  - time ./bootstrap --skip-po --no-git
-  - time ./configure --enable-java
-  - time make check V=1 VERBOSE=t
-  - time make dist
-  - time make syntax-check
-
-Debian testing:
-  extends: .test
+B-Debian-testing:
   image: $CI_REGISTRY/libidn/build-images:libidn-Debian-testing
-  stage: build
+  stage: bootstrap
   script:
   - time ./bootstrap --skip-po --no-git
   - time ./configure --enable-java
@@ -139,47 +133,137 @@ Debian testing:
   - git clone --depth=1 https://salsa.debian.org/debian/libidn.git debian-libidn
   - debian-libidn/debian/tests/idn
   - debian-libidn/debian/tests/libidn
+  - git diff --exit-code # nothing should change version controlled files
 
-Fedora latest:
-  extends: .test
+B-Fedora-latest:
   image: $CI_REGISTRY/libidn/build-images:libidn-Fedora-latest
-  stage: build
+  stage: bootstrap
   script:
   - time ./bootstrap --skip-po --no-git
   - time ./configure --enable-java
   - time make check V=1 VERBOSE=t
   - time make distcheck
+  - git diff --exit-code # nothing should change version controlled files
 
-Ubuntu latest:
-  extends: .test
+B-Trisquel11:
+  image: $CI_REGISTRY/libidn/build-images:libidn-Trisquel11
+  stage: bootstrap
+  script:
+  - time ./bootstrap --skip-po --no-git
+  - time ./configure --enable-java
+  - time make check V=1 VERBOSE=t
+  - time make dist
+  - time make syntax-check
+  - git diff --exit-code # nothing should change version controlled files
+
+B-Ubuntu-latest:
   image: $CI_REGISTRY/libidn/build-images:libidn-Ubuntu-latest
-  stage: build
+  stage: bootstrap
   script:
   - time ./bootstrap --skip-po --no-git
   - time ./configure --enable-java
   - time make check V=1 VERBOSE=t
   - time make distcheck
+  - git diff --exit-code # nothing should change version controlled files
+
+B-MacOS13Xcode14:
+  image: macos-13-xcode-14
+  stage: bootstrap
+  tags:
+  - saas-macos-medium-m1
+  before_script:
+  - env HOMEBREW_NO_AUTO_UPDATE=1 HOMEBREW_NO_INSTALL_UPGRADE=1 HOMEBREW_NO_INSTALL_CLEANUP=1 HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1 brew install autoconf automake libtool gengetopt help2man texinfo
+  script:
+  - time ./bootstrap --skip-po
+  - time ./configure --enable-gcc-warnings
+  - make syntax-check
+  - make -j$(nproc) check V=1 VERBOSE=t
+  - git diff --exit-code # nothing should change version controlled files
 
 B-clang:
-  extends: .test
   image: silkeh/clang:15-bullseye
-  stage: build
+  stage: bootstrap
   before_script:
+  - clang --version
   - apt-get update -qq
   - apt-get install -qqy --no-install-recommends make git autoconf automake libtool gettext autopoint cvs texinfo texlive texlive-plain-generic texlive-extra-utils help2man gtk-doc-tools dblatex valgrind gengetopt transfig mono-mcs gperf default-jdk-headless
   script:
-  - ./bootstrap --skip-po
-  - ./configure CC="clang-15 -std=gnu2x"
-  - make V=1
-  - make check V=1 VERBOSE=t
-  - git status
-  - git diff --exit-code
+  - time ./bootstrap --skip-po
+  - time ./configure CC="clang-15 -std=gnu2x"
+  - time make V=1
+  - time make check V=1 VERBOSE=t
+  - git diff --exit-code # nothing should change version controlled files
+
+B-gcc:
+  image: gcc:latest
+  stage: bootstrap
+  before_script:
+  - gcc --version
+  - apt-get update -qqy
+  - apt-get install -qqy --no-install-recommends make git autoconf automake libtool gettext autopoint cvs help2man valgrind gengetopt gperf
+  script:
+  - time ./bootstrap --skip-po
+  - time ./configure --enable-gcc-warnings --disable-doc CC="/usr/local/bin/gcc -std=gnu2x"
+  - time make V=1
+  - time make syntax-check
+  - time make check VERBOSE=t
+  - git diff --exit-code # nothing should change version controlled files
+
+AlmaLinux:
+  image: almalinux:8
+  stage: tarball
+  needs: [B-Trisquel11]
+  before_script:
+  - dnf -y install make gcc diffutils valgrind
+  script:
+  - tar xfa libidn-*.tar.gz
+  - cd `ls -d libidn-* | grep -v tar.gz`
+  - time ./configure
+  - time make check V=1 VERBOSE=t
+
+Alpine:
+  image: alpine:latest
+  stage: tarball
+  needs: [B-Trisquel11]
+  before_script:
+  - apk update
+  - apk add build-base
+  script:
+  - tar xfz libidn-*.tar.gz
+  - cd `ls -d libidn-* | grep -v tar.gz`
+  - time ./configure
+  - time make check V=1 VERBOSE=t
+
+ArchLinux:
+  image: archlinux:latest
+  stage: tarball
+  needs: [B-Trisquel11]
+  before_script:
+  - pacman -Syu --noconfirm make gcc diffutils
+  script:
+  - tar xfz libidn-*.tar.gz
+  - cd `ls -d libidn-* | grep -v tar.gz`
+  - mkdir b
+  - cd b
+  - time ../configure
+  - time make check V=1 VERBOSE=t
+
+CentOS7:
+  image: centos:7
+  stage: tarball
+  needs: [B-Trisquel11]
+  before_script:
+  - yum -y install make gcc diffutils valgrind
+  script:
+  - tar xfa libidn-*.tar.gz
+  - cd `ls -d libidn-* | grep -v tar.gz`
+  - time ./configure
+  - time make check V=1 VERBOSE=t
 
 Debian10:
-  extends: .test
   image: debian:10-slim
-  stage: test
-  needs: [Debian11]
+  stage: tarball
+  needs: [B-Trisquel11]
   before_script:
   - apt-get update
   - env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq make gcc
@@ -191,40 +275,10 @@ Debian10:
   - time ../configure
   - time make check V=1 VERBOSE=t
 
-Alpine:
-  extends: .test
-  image: alpine:latest
-  stage: test
-  needs: [Debian11]
-  before_script:
-  - apk update
-  - apk add build-base
-  script:
-  - tar xfz libidn-*.tar.gz
-  - cd `ls -d libidn-* | grep -v tar.gz`
-  - time ./configure
-  - time make check V=1 VERBOSE=t
-
-ArchLinux:
-  extends: .test
-  image: archlinux:latest
-  stage: test
-  needs: [Debian11]
-  before_script:
-  - pacman -Syu --noconfirm make gcc diffutils
-  script:
-  - tar xfz libidn-*.tar.gz
-  - cd `ls -d libidn-* | grep -v tar.gz`
-  - mkdir b
-  - cd b
-  - time ../configure
-  - time make check V=1 VERBOSE=t
-
-Fedora:
-  extends: .test
+Fedora-latest:
   image: fedora:latest
-  stage: test
-  needs: [Debian11]
+  stage: tarball
+  needs: [B-Trisquel11]
   before_script:
   - dnf -y install make gcc diffutils valgrind
   script:
@@ -233,37 +287,10 @@ Fedora:
   - time ./configure
   - time make check V=1 VERBOSE=t
 
-CentOS7:
-  extends: .test
-  image: centos:7
-  stage: test
-  needs: [Debian11]
-  before_script:
-  - yum -y install make gcc diffutils valgrind
-  script:
-  - tar xfa libidn-*.tar.gz
-  - cd `ls -d libidn-* | grep -v tar.gz`
-  - time ./configure
-  - time make check V=1 VERBOSE=t
-
-AlmaLinux:
-  extends: .test
-  image: almalinux:8
-  stage: test
-  needs: [Debian11]
-  before_script:
-  - dnf -y install make gcc diffutils valgrind
-  script:
-  - tar xfa libidn-*.tar.gz
-  - cd `ls -d libidn-* | grep -v tar.gz`
-  - time ./configure
-  - time make check V=1 VERBOSE=t
-
-Ubuntu-12.04:
-  extends: .test
+Ubuntu12.04:
   image: ubuntu:12.04
-  stage: test
-  needs: [Debian11]
+  stage: tarball
+  needs: [B-Trisquel11]
   before_script:
   - perl -pi -e 's/archive.ubuntu.com/old-releases.ubuntu.com/g' /etc/apt/sources.list
   - apt-get update -q
@@ -274,11 +301,10 @@ Ubuntu-12.04:
   - time ./configure
   - time make check V=1 VERBOSE=t
 
-Ubuntu-14.04:
-  extends: .test
+Ubuntu14.04:
   image: ubuntu:14.04
-  stage: test
-  needs: [Debian11]
+  stage: tarball
+  needs: [B-Trisquel11]
   before_script:
   - apt-get update -qq
   - env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq make gcc valgrind
@@ -288,11 +314,10 @@ Ubuntu-14.04:
   - time ./configure --disable-tld
   - time make check V=1 VERBOSE=t
 
-Ubuntu rolling:
-  extends: .test
+Ubuntu-rolling:
   image: ubuntu:rolling
-  stage: test
-  needs: [Debian11]
+  stage: tarball
+  needs: [B-Trisquel11]
   before_script:
   - apt-get update -qq
   - env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq git make gcc valgrind gtk-doc-tools texinfo texlive texlive-plain-generic
@@ -304,10 +329,9 @@ Ubuntu rolling:
   - make distcheck
 
 Mingw32:
-  extends: .test
   image: debian:12-slim
-  stage: test
-  needs: [Debian11]
+  stage: tarball
+  needs: [B-Trisquel11]
   before_script:
   - dpkg --add-architecture i386
   - apt-get update -qq
@@ -322,10 +346,9 @@ Mingw32:
   - time make check V=1 VERBOSE=t
 
 Mingw64:
-  extends: .test
   image: debian:12-slim
-  stage: test
-  needs: [Debian11]
+  stage: tarball
+  needs: [B-Trisquel11]
   before_script:
   - apt-get update -qq
   - env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq make mingw-w64 wine wine64 binfmt-support wine-binfmt
@@ -339,10 +362,9 @@ Mingw64:
   - time make check V=1 VERBOSE=t
 
 Armcross:
-  extends: .test
   image: debian:12-slim
-  stage: test
-  needs: [Debian11]
+  stage: tarball
+  needs: [B-Trisquel11]
   before_script:
   - apt-get update -qq
   - env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq make gcc-arm-linux-gnueabi qemu-user qemu-user-binfmt file binfmt-support
@@ -360,7 +382,7 @@ Armcross:
 
 .pages:
   image: $CI_REGISTRY/libidn/build-images:libidn-Debian-testing
-  stage: build
+  stage: bootstrap
   script:
   - time ./bootstrap --skip-po --no-git
   - time ./configure --enable-java --enable-gtk-doc --enable-gtk-doc-pdf
