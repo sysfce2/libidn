@@ -31,7 +31,6 @@ VC_LIST_ALWAYS_EXCLUDE_REGEX = \
 exclude_file_name_regexp--sc_trailing_blank = '^doc/components.fig\|csharp/\|fuzz/libidn_\(toascii\|stringprep\|tounicode\)_fuzzer.in/.*\|java/src/\|lib/gen-unicode-tables.pl\|lib/\(gunibreak\|gunicomp\|gunidecomp\).h$$'
 exclude_file_name_regexp--sc_bindtextdomain = ^examples/|libc/|tests/|fuzz/
 exclude_file_name_regexp--sc_prohibit_atoi_atof = ^examples/example2.c$$
-exclude_file_name_regexp--sc_copyright_check = ^doc/libidn.texi
 exclude_file_name_regexp--sc_useless_cpp_parens = ^lib/nfkc.c$$
 exclude_file_name_regexp--sc_prohibit_strncpy = ^src/idn.c$$
 exclude_file_name_regexp--sc_prohibit_empty_lines_at_EOF = ^fuzz/libidn_.*fuzzer.(in|repro)/.*$$
