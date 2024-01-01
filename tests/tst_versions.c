@@ -1,5 +1,5 @@
 /* tst_version.c --- Version number sanity checks.
- * Copyright (C) 2022-2023 Simon Josefsson
+ * Copyright (C) 2022-2024 Simon Josefsson
  *
  * This file is part of GNU Libidn.
  *
