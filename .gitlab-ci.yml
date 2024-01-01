@@ -15,6 +15,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+variables:
+  GIT_DEPTH: 100
+
 stages:
  - quick
  - build
@@ -35,7 +38,7 @@ Q-Debian-testing:
   image: $CI_REGISTRY/libidn/build-images:libidn-mini-Debian-testing
   stage: quick
   script:
-  - time ./bootstrap --skip-po --no-git
+  - time ./bootstrap --skip-po
   - time ./configure --disable-doc
   - time make syntax-check
   - time make V=1
@@ -81,8 +84,12 @@ Coverity:
     paths:
       - cov-int/*.txt
 
-B-Alpine:
+B-Alpine-arm64:
+  rules:
+  - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  - when: manual
   image: alpine:latest
+  tags: [ arm64 ]
   stage: build
   before_script:
   - apk update
@@ -99,7 +106,7 @@ B-Debian9:
   image: $CI_REGISTRY/libidn/build-images:libidn-Debian9
   stage: build
   script:
-  - time ./bootstrap --skip-po --no-git
+  - time ./bootstrap --skip-po
   - time ./configure --enable-java
   - time make check V=1 VERBOSE=t
   - time make dist
@@ -113,7 +120,7 @@ B-Debian12:
   - apt-get update
   - apt-get install -y -qq wget
   script:
-  - time ./bootstrap --no-git
+  - time ./bootstrap
   - time ./configure --enable-java
   - time make syntax-check
   - time make check V=1 VERBOSE=t
@@ -124,7 +131,7 @@ B-Debian-testing:
   image: $CI_REGISTRY/libidn/build-images:libidn-Debian-testing
   stage: build
   script:
-  - time ./bootstrap --skip-po --no-git
+  - time ./bootstrap --skip-po
   - time ./configure --enable-java
   - time make check V=1 VERBOSE=t
   - time make distcheck
@@ -139,7 +146,7 @@ B-Fedora-latest:
   image: $CI_REGISTRY/libidn/build-images:libidn-Fedora-latest
   stage: build
   script:
-  - time ./bootstrap --skip-po --no-git
+  - time ./bootstrap --skip-po
   - time ./configure --enable-java
   - time make check V=1 VERBOSE=t
   - time make distcheck
@@ -149,7 +156,7 @@ B-Trisquel11:
   image: $CI_REGISTRY/libidn/build-images:libidn-Trisquel11
   stage: build
   script:
-  - time ./bootstrap --skip-po --no-git
+  - time ./bootstrap --skip-po
   - time ./configure --enable-java
   - time make -j$(nproc) check V=1 VERBOSE=t
   - time make dist
@@ -160,7 +167,7 @@ B-Ubuntu-latest:
   image: $CI_REGISTRY/libidn/build-images:libidn-Ubuntu-latest
   stage: build
   script:
-  - time ./bootstrap --skip-po --no-git
+  - time ./bootstrap --skip-po
   - time ./configure --enable-java
   - time make check V=1 VERBOSE=t
   - time make distcheck
@@ -168,6 +175,9 @@ B-Ubuntu-latest:
 
 # https://docs.gitlab.com/ee/ci/runners/saas/macos/environment.html
 B-MacOS14Xcode15:
+  rules:
+  - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  - when: manual
   stage: build
   image: macos-14-xcode-15
   tags: [ saas-macos-medium-m1 ]
@@ -186,6 +196,9 @@ B-MacOS14Xcode15:
   - git diff --exit-code # nothing should change version controlled files
 
 macOS13Xcode14:
+  rules:
+  - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  - when: manual
   image: macos-13-xcode-14
   tags: [ saas-macos-medium-m1 ]
   stage: test
@@ -229,6 +242,73 @@ B-gcc:
   - time make syntax-check
   - time make check VERBOSE=t
   - git diff --exit-code # nothing should change version controlled files
+
+# https://docs.gitlab.com/ee/ci/runners/saas/windows_saas_runner.html
+B-Windows-UCRT64:
+  when: manual # FAIL: tst_stringprep: stringprep() entry 0 failed: 201, FAIL: tst_idna: IDNA entry 0 failed: 1, FAIL: tst_idna2: IDNA2 entry 0 failed: 1, FAIL: tst_idna3: IDNA3[0] failed
+  tags: [ shared-windows, windows-1809 ]
+  stage: build
+  script: # https://www.msys2.org/docs/ci/#other-systems
+  - wget.exe -nv -O msys2.exe https://github.com/msys2/msys2-installer/releases/download/nightly-x86_64/msys2-base-x86_64-latest.sfx.exe
+  - ./msys2.exe -y -oC:\
+  - Remove-Item msys2.exe
+  - $env:CHERE_INVOKING = 'yes'
+  - $env:MSYSTEM = 'UCRT64' # https://www.msys2.org/docs/environments/
+  - C:\msys64\usr\bin\bash -lc ' '
+  - C:\msys64\usr\bin\bash -lc 'pacman --noconfirm -Syuu'
+  - C:\msys64\usr\bin\bash -lc 'pacman --noconfirm -Syuu'
+  - |
+    C:\msys64\usr\bin\bash -lcx '
+    pacman --noconfirm -Syu git autoconf automake libtool make mingw-w64-ucrt-x86_64-gcc gtk-doc help2man gengetopt gperf patch gettext-devel
+    ./bootstrap --skip-po
+    ./configure --enable-gcc-warnings --disable-doc
+    make -j$(nproc) V=1 -k check VERBOSE=t'
+
+Windows-MSYS:
+  rules:
+  - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  - when: manual
+  tags: [ shared-windows, windows-1809 ]
+  stage: test
+  needs: [B-Trisquel11]
+  script: # https://www.msys2.org/docs/ci/#other-systems
+  - wget.exe -nv -O msys2.exe https://github.com/msys2/msys2-installer/releases/download/nightly-x86_64/msys2-base-x86_64-latest.sfx.exe
+  - ./msys2.exe -y -oC:\
+  - Remove-Item msys2.exe
+  - $env:CHERE_INVOKING = 'yes'
+  - $env:MSYSTEM = 'MSYS' # https://www.msys2.org/docs/environments/
+  - C:\msys64\usr\bin\bash -lc ' '
+  - C:\msys64\usr\bin\bash -lc 'pacman --noconfirm -Syuu'
+  - C:\msys64\usr\bin\bash -lc 'pacman --noconfirm -Syuu'
+  - |
+    C:\msys64\usr\bin\bash -lcx '
+    pacman --noconfirm -Syu make gcc
+    tar xfa libidn-*.tar.gz
+    cd `ls -d libidn-* | grep -v tar.gz`
+    ./configure --enable-gcc-warnings --disable-doc
+    make -j$(nproc) V=1 -k check VERBOSE=t'
+
+Windows-MINGW64:
+  when: manual # FAIL: tst_stringprep: stringprep() entry 0 failed: 201
+  tags: [ shared-windows, windows-1809 ]
+  stage: test
+  needs: [B-Trisquel11]
+  script: # https://www.msys2.org/docs/ci/#other-systems
+  - wget.exe -nv -O msys2.exe https://github.com/msys2/msys2-installer/releases/download/nightly-x86_64/msys2-base-x86_64-latest.sfx.exe
+  - ./msys2.exe -y -oC:\
+  - Remove-Item msys2.exe
+  - $env:CHERE_INVOKING = 'yes'
+  - $env:MSYSTEM = 'MINGW64' # https://www.msys2.org/docs/environments/
+  - C:\msys64\usr\bin\bash -lc ' '
+  - C:\msys64\usr\bin\bash -lc 'pacman --noconfirm -Syuu'
+  - C:\msys64\usr\bin\bash -lc 'pacman --noconfirm -Syuu'
+  - |
+    C:\msys64\usr\bin\bash -lcx '
+    pacman --noconfirm -Syu make mingw-w64-x86_64-gcc
+    tar xfa libidn-*.tar.gz
+    cd `ls -d libidn-* | grep -v tar.gz`
+    ./configure --enable-gcc-warnings --disable-doc
+    make -j$(nproc) V=1 -k check VERBOSE=t'
 
 AlmaLinux:
   image: almalinux:8
@@ -349,6 +429,22 @@ Ubuntu-rolling:
   - time make check V=1 VERBOSE=t
   - make distcheck
 
+RockyLinux9-ppc64:
+  rules:
+  - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  - when: manual
+  image: rockylinux:9
+  tags: [ ppc64 ]
+  stage: test
+  needs: [B-Trisquel11]
+  before_script:
+  - dnf -y install make gcc valgrind
+  script:
+  - tar xfa libidn-*.tar.gz
+  - cd `ls -d libidn-* | grep -v tar.gz`
+  - time ./configure --enable-gcc-warnings
+  - time make -j$(nproc) check V=1 VERBOSE=t
+
 Mingw32:
   image: debian:12-slim
   stage: test
@@ -405,7 +501,7 @@ Armcross:
   image: $CI_REGISTRY/libidn/build-images:libidn-Debian-testing
   stage: build
   script:
-  - time ./bootstrap --skip-po --no-git
+  - time ./bootstrap --skip-po
   - time ./configure --enable-java --enable-gtk-doc --enable-gtk-doc-pdf
   - time make V=1
   - mkdir -p public
