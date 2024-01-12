@@ -18,6 +18,10 @@
 variables:
   GIT_DEPTH: 100
 
+workflow:
+  rules:
+  - if: $CI_COMMIT_BRANCH
+
 stages:
  - quick
  - build
