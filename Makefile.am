@@ -29,6 +29,7 @@ SUBDIRS += csharp
 endif
 
 EXTRA_DIST = cfg.mk maint.mk
+EXTRA_DIST += CONTRIBUTING.md
 EXTRA_DIST += COPYING.LESSERv2 COPYING.LESSERv3 COPYINGv2 COPYINGv3
 
 ACLOCAL_AMFLAGS = -I lib/m4 -I gl/m4 -I lib/gl/m4 -I m4
@@ -49,8 +50,6 @@ EXTRA_DIST += windows/libidn.sln windows/libidn.vcproj			\
 	windows/include/unistd.h windows/include/idn-int.h		\
 	windows/include/stdbool.h windows/include/ac-stdint.h		\
 	windows/include/config.h windows/libidn4win.mk
-
-EXTRA_DIST += HACKING
 
 # git-version-gen
 EXTRA_DIST += $(top_srcdir)/.version
