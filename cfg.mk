@@ -21,9 +21,9 @@ old_NEWS_hash = a16cf9fccf6fb6870d51cc54a4069118
 
 bootstrap-tools = gnulib,autoconf,automake,libtoolize,make,makeinfo,help2man,gperf,gengetopt,gtkdocize,tar,gzip
 
-local-checks-to-skip = sc_GPL_version sc_codespell	\
-	sc_prohibit_have_config_h sc_prohibit_strcmp	\
-	sc_require_config_h sc_require_config_h_first
+local-checks-to-skip = sc_GPL_version sc_prohibit_strcmp
+local-checks-to-skip += sc_prohibit_have_config_h sc_require_config_h	\
+	sc_require_config_h_first
 VC_LIST_ALWAYS_EXCLUDE_REGEX = \
 	^(GNUmakefile|maint.mk|gtk-doc.make|m4/pkg.m4|m4/libtool.m4|doc/specifications|contrib/doxygen/Doxyfile|doc/fdl-1.3.texi|csharp/libidn.*suo|(lib/)?(gl|gltests|build-aux)/)
 
@@ -56,7 +56,7 @@ my-update-copyright:
 
 sc_codespell:
 	@if `which codespell > /dev/null`; then \
-		codespell -L tim,ede,wich `git ls-files|egrep -v '^doc/specifications/.*|doc/gdoc|fuzz/libidn_(stringprep|toascii|tounicode)_fuzzer.in/.*$$'`; \
+		codespell -L te,ba,noe,nwe,mye,myu,tye,tim,ede,wich `git ls-files|egrep -v '^gnulib|doc/specifications/.*|doc/gdoc|fuzz/libidn_(stringprep|toascii|tounicode)_fuzzer.in/.*$$'`; \
 	fi
 
 sc_libtool_version_bump:

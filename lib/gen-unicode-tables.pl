@@ -20,7 +20,7 @@
 # I consider the output of this program to be unrestricted.  Use it as
 # you will.
 
-# Contributer(s):
+# Contributor(s):
 #   Andrew Taylor <andrew.taylor@montage.ca>
 
 # gen-unicode-tables.pl - Generate tables for libunicode from Unicode data.
@@ -196,7 +196,7 @@ defined $bidimirroringtxt or die "Did not find BidiMirroring file";
 print "Creating decomp table\n" if ($do_decomp);
 print "Creating property table\n" if ($do_props);
 
-print "Composition exlusions from $compositionexclusionstxt\n";
+print "Composition exclusions from $compositionexclusionstxt\n";
 
 open (INPUT, "< $compositionexclusionstxt") || exit 1;
 

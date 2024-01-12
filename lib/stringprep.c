@@ -385,7 +385,7 @@ stringprep_4zi (uint32_t *ucs4, size_t maxucs4len,
 
 /**
  * stringprep:
- * @in: input/ouput array with string to prepare.
+ * @in: input/output array with string to prepare.
  * @maxlen: maximum length of input/output array.
  * @flags: a #Stringprep_profile_flags value, or 0.
  * @profile: pointer to #Stringprep_profile to use.
@@ -683,7 +683,7 @@ stringprep_profile (const char *in,
 
 /**
  * stringprep_nameprep:
- * @in: input/ouput array with string to prepare.
+ * @in: input/output array with string to prepare.
  * @maxlen: maximum length of input/output array.
  *
  * Prepare the input UTF-8 string according to the nameprep profile.
@@ -694,7 +694,7 @@ stringprep_profile (const char *in,
 
 /**
  * stringprep_nameprep_no_unassigned:
- * @in: input/ouput array with string to prepare.
+ * @in: input/output array with string to prepare.
  * @maxlen: maximum length of input/output array.
  *
  * Prepare the input UTF-8 string according to the nameprep profile.
@@ -704,7 +704,7 @@ stringprep_profile (const char *in,
 
 /**
  * stringprep_iscsi:
- * @in: input/ouput array with string to prepare.
+ * @in: input/output array with string to prepare.
  * @maxlen: maximum length of input/output array.
  *
  * Prepare the input UTF-8 string according to the draft iSCSI
@@ -713,7 +713,7 @@ stringprep_profile (const char *in,
 
 /**
  * stringprep_plain:
- * @in: input/ouput array with string to prepare.
+ * @in: input/output array with string to prepare.
  * @maxlen: maximum length of input/output array.
  *
  * Prepare the input UTF-8 string according to the draft SASL
@@ -722,7 +722,7 @@ stringprep_profile (const char *in,
 
 /**
  * stringprep_kerberos5:
- * @in: input/ouput array with string to prepare.
+ * @in: input/output array with string to prepare.
  * @maxlen: maximum length of input/output array.
  *
  * Prepare the input UTF-8 string according to the draft Kerberos 5
@@ -732,7 +732,7 @@ stringprep_profile (const char *in,
 
 /**
  * stringprep_xmpp_nodeprep:
- * @in: input/ouput array with string to prepare.
+ * @in: input/output array with string to prepare.
  * @maxlen: maximum length of input/output array.
  *
  * Prepare the input UTF-8 string according to the draft XMPP node

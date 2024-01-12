@@ -40,7 +40,7 @@ assert_symbol_exists (const void *p)
 {
   assert (p);
   if (!p)
-    fail ("symbo NULL?!\n");
+    fail ("symbol NULL?!\n");
 }
 
 void
