@@ -2,6 +2,8 @@ Libidn NEWS -- History of user-visible changes.                 -*- outline -*-
 
 * Noteworthy changes in release ?.? (????-??-??) [?]
 
+** Bump required gettext version to 0.19.8 for musl-libc.
+
 ** Updated translations.
 
 ** Update gnulib files and build fixes.
