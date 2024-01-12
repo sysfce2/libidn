@@ -40,9 +40,9 @@ Q-Debian-testing:
   script:
   - time ./bootstrap --skip-po
   - time ./configure --disable-doc
-  - time make syntax-check
-  - time make V=1
-  - time make check VERBOSE=t V=1
+  - time make -j$(nproc) syntax-check
+  - time make -j$(nproc) V=1
+  - time make -j$(nproc) check VERBOSE=t V=1
   - git diff --exit-code # nothing should change version controlled files
 
 # https://docs.gitlab.com/ee/user/application_security/sast/#customizing-the-sast-settings
@@ -73,7 +73,7 @@ Coverity:
   - tar xfz /tmp/cov-analysis-linux64.tgz
   - time ./bootstrap --skip-po
   - time ./configure --enable-gcc-warnings --disable-doc CFLAGS="-g -Og"
-  - cov-analysis-linux64-*/bin/cov-build --dir cov-int make check -j$(nproc)
+  - cov-analysis-linux64-*/bin/cov-build --dir cov-int make -j$(nproc) check
   - tar cfz cov-int.tar.gz cov-int
   - curl https://scan.coverity.com/builds?project=$COVERITY_SCAN_PROJECT_NAME
     --form token=$COVERITY_SCAN_TOKEN --form email=$GITLAB_USER_EMAIL
@@ -97,9 +97,9 @@ B-Alpine-arm64:
   script:
   - time ./bootstrap --skip-po
   - time ./configure --disable-doc
-  - time make syntax-check
+  - time make -j$(nproc) syntax-check
   - time make -j$(nproc) V=1
-  - time make check V=1 VERBOSE=t
+  - time make -j$(nproc) check V=1 VERBOSE=t
   - git diff --exit-code # nothing should change version controlled files
 
 B-Debian9:
@@ -108,9 +108,9 @@ B-Debian9:
   script:
   - time ./bootstrap --skip-po
   - time ./configure --enable-java
-  - time make check V=1 VERBOSE=t
-  - time make dist
-  - time make syntax-check
+  - time make -j$(nproc) check V=1 VERBOSE=t
+  - time make -j$(nproc) dist
+  - time make -j$(nproc) syntax-check
   - git diff --exit-code # nothing should change version controlled files
 
 B-Debian12:
@@ -122,9 +122,9 @@ B-Debian12:
   script:
   - time ./bootstrap
   - time ./configure --enable-java
-  - time make syntax-check
-  - time make check V=1 VERBOSE=t
-  - time make dist
+  - time make -j$(nproc) syntax-check
+  - time make -j$(nproc) check V=1 VERBOSE=t
+  - time make -j$(nproc) dist
   - git diff --exit-code # nothing should change version controlled files
 
 B-Debian-testing:
@@ -133,9 +133,9 @@ B-Debian-testing:
   script:
   - time ./bootstrap --skip-po
   - time ./configure --enable-java
-  - time make check V=1 VERBOSE=t
-  - time make distcheck
-  - make install
+  - time make -j$(nproc) check V=1 VERBOSE=t
+  - time make -j$(nproc) distcheck
+  - make -j$(nproc) install
   - apt-get install -y -qq man
   - git clone --depth=1 https://salsa.debian.org/debian/libidn.git debian-libidn
   - debian-libidn/debian/tests/idn
@@ -148,8 +148,8 @@ B-Fedora-latest:
   script:
   - time ./bootstrap --skip-po
   - time ./configure --enable-java
-  - time make check V=1 VERBOSE=t
-  - time make distcheck
+  - time make -j$(nproc) check V=1 VERBOSE=t
+  - time make -j$(nproc) distcheck
   - git diff --exit-code # nothing should change version controlled files
 
 B-Trisquel11:
@@ -159,8 +159,8 @@ B-Trisquel11:
   - time ./bootstrap --skip-po
   - time ./configure --enable-java
   - time make -j$(nproc) check V=1 VERBOSE=t
-  - time make dist
-  - time make syntax-check
+  - time make -j$(nproc) dist
+  - time make -j$(nproc) syntax-check
   - git diff --exit-code # nothing should change version controlled files
 
 B-Ubuntu-latest:
@@ -169,8 +169,8 @@ B-Ubuntu-latest:
   script:
   - time ./bootstrap --skip-po
   - time ./configure --enable-java
-  - time make check V=1 VERBOSE=t
-  - time make distcheck
+  - time make -j$(nproc) check V=1 VERBOSE=t
+  - time make -j$(nproc) distcheck
   - git diff --exit-code # nothing should change version controlled files
 
 # https://docs.gitlab.com/ee/ci/runners/saas/macos/environment.html
@@ -191,7 +191,7 @@ B-MacOS14Xcode15:
   script:
   - time ./bootstrap --skip-po
   - time ./configure --enable-gcc-warnings
-  - make syntax-check
+  - make -j$(nproc) syntax-check
   - make -j$(nproc) check V=1 VERBOSE=t
   - git diff --exit-code # nothing should change version controlled files
 
@@ -209,7 +209,7 @@ macOS13Xcode14:
   - mkdir b
   - cd b
   - ../configure --enable-gcc-warnings
-  - make syntax-check
+  - make -j$(nproc) syntax-check
   - make -j$(nproc) V=1 check VERBOSE=t
 
 B-clang:
@@ -224,7 +224,7 @@ B-clang:
   - time ./bootstrap --skip-po
   - time ./configure CC="clang -std=gnu2x" --enable-gcc-warnings --disable-doc
   - time make -j$(nproc) V=1
-  - time make check V=1 VERBOSE=t
+  - time make -j$(nproc) check V=1 VERBOSE=t
   - git diff --exit-code # nothing should change version controlled files
 
 B-gcc:
@@ -239,8 +239,8 @@ B-gcc:
   - time ./bootstrap --skip-po
   - time ./configure CC="gcc -std=gnu2x" --enable-gcc-warnings --disable-doc
   - time make -j$(nproc) V=1
-  - time make syntax-check
-  - time make check VERBOSE=t
+  - time make -j$(nproc) syntax-check
+  - time make -j$(nproc) check VERBOSE=t
   - git diff --exit-code # nothing should change version controlled files
 
 # https://docs.gitlab.com/ee/ci/runners/saas/windows_saas_runner.html
@@ -320,7 +320,7 @@ AlmaLinux:
   - tar xfa libidn-*.tar.gz
   - cd `ls -d libidn-* | grep -v tar.gz`
   - time ./configure
-  - time make check V=1 VERBOSE=t
+  - time make -j$(nproc) check V=1 VERBOSE=t
 
 Alpine:
   image: alpine:latest
@@ -333,7 +333,7 @@ Alpine:
   - tar xfz libidn-*.tar.gz
   - cd `ls -d libidn-* | grep -v tar.gz`
   - time ./configure
-  - time make check V=1 VERBOSE=t
+  - time make -j$(nproc) check V=1 VERBOSE=t
 
 ArchLinux:
   image: archlinux:latest
@@ -347,7 +347,7 @@ ArchLinux:
   - mkdir b
   - cd b
   - time ../configure
-  - time make check V=1 VERBOSE=t
+  - time make -j$(nproc) check V=1 VERBOSE=t
 
 CentOS7:
   image: centos:7
@@ -359,7 +359,7 @@ CentOS7:
   - tar xfa libidn-*.tar.gz
   - cd `ls -d libidn-* | grep -v tar.gz`
   - time ./configure
-  - time make check V=1 VERBOSE=t
+  - time make -j$(nproc) check V=1 VERBOSE=t
 
 Debian10:
   image: debian:10-slim
@@ -374,7 +374,7 @@ Debian10:
   - mkdir b
   - cd b
   - time ../configure
-  - time make check V=1 VERBOSE=t
+  - time make -j$(nproc) check V=1 VERBOSE=t
 
 Fedora-latest:
   image: fedora:latest
@@ -400,7 +400,7 @@ Ubuntu12.04:
   - tar xfa libidn-*.tar.gz
   - cd `ls -d libidn-* | grep -v tar.gz`
   - time ./configure
-  - time make check V=1 VERBOSE=t
+  - time make -j$(nproc) check V=1 VERBOSE=t
 
 Ubuntu14.04:
   image: ubuntu:14.04
@@ -413,7 +413,7 @@ Ubuntu14.04:
   - tar xfa libidn-*.tar.gz
   - cd `ls -d libidn-* | grep -v tar.gz`
   - time ./configure --disable-tld
-  - time make check V=1 VERBOSE=t
+  - time make -j$(nproc) check V=1 VERBOSE=t
 
 Ubuntu-rolling:
   image: ubuntu:rolling
@@ -426,8 +426,8 @@ Ubuntu-rolling:
   - tar xfa libidn-*.tar.gz
   - cd `ls -d libidn-* | grep -v tar.gz`
   - time ./configure
-  - time make check V=1 VERBOSE=t
-  - make distcheck
+  - time make -j$(nproc) check V=1 VERBOSE=t
+  - make -j$(nproc) distcheck
 
 RockyLinux9-ppc64:
   rules:
@@ -460,7 +460,7 @@ Mingw32:
   - mkdir b
   - cd b
   - time ../configure --host=i686-w64-mingw32 CC='i686-w64-mingw32-gcc -static-libgcc'
-  - time make check V=1 VERBOSE=t
+  - time make -j$(nproc) check V=1 VERBOSE=t
 
 Mingw64:
   image: debian:12-slim
@@ -476,7 +476,7 @@ Mingw64:
   - mkdir b
   - cd b
   - time ../configure --host=x86_64-w64-mingw32
-  - time make check V=1 VERBOSE=t
+  - time make -j$(nproc) check V=1 VERBOSE=t
 
 Armcross:
   image: debian:12-slim
@@ -492,10 +492,10 @@ Armcross:
   - mkdir b
   - cd b
   - ../configure --host=arm-linux-gnueabi CFLAGS="-static --static"
-  - make V=1
+  - make -j$(nproc) V=1
   - file src/idn
   - LANG=C.UTF-8 qemu-arm src/idn --debug foo
-  - time make check V=1 VERBOSE=t
+  - time make -j$(nproc) check V=1 VERBOSE=t
 
 .pages:
   image: $CI_REGISTRY/libidn/build-images:libidn-Debian-testing
