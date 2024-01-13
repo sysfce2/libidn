@@ -38,6 +38,12 @@ exclude_file_name_regexp--sc_two_space_separator_in_usage = ^cfg.mk$$
 exclude_file_name_regexp--sc_prohibit_always_true_header_tests = ^lib/toutf8.c$$
 exclude_file_name_regexp--sc_indent = '^lib/\(gunibreak\|gunicomp\|gunidecomp\).h$$'
 
+# maint.mk's public-submodule-commit breaks on shallow gnulib
+# https://lists.gnu.org/archive/html/bug-gnulib/2022-08/msg00040.html
+# so let's disable it - XXX FIXME let's revisit this later
+submodule-checks =
+gl_public_submodule_commit =
+
 aximport:
 	for f in m4/ax_*.m4; do \
 		wget -O $$f "https://git.savannah.gnu.org/gitweb/?p=autoconf-archive.git;a=blob_plain;f=$$f"; \
