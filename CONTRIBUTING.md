@@ -43,6 +43,7 @@ dnf install -y make git autoconf automake libtool gettext-devel cvs
 dnf install -y texinfo texinfo-tex texlive
 dnf install -y help2man gtk-doc gengetopt dblatex valgrind
 dnf install -y gperf java-latest-openjdk-devel
+```
 
 On macOS with Xcode and Homebrew:
 ```
@@ -51,26 +52,36 @@ brew install autoconf automake libtool gengetopt help2man texinfo fig2dev
 
 To download the version controlled sources:
 
-  git clone https://git.savannah.gnu.org/git/libidn.git
-  cd libidn
+```
+git clone https://git.savannah.gnu.org/git/libidn.git
+cd libidn
+```
 
 The next step is to import gnulib files, run autoreconf etc:
 
-  ./bootstrap
+```
+./bootstrap
+```
 
 If you have a local checkout of gnulib and wants to avoid download
 another copy, you may want to use:
 
-  ./bootstrap --gnulib-srcdir=../gnulib
+```
+./bootstrap --gnulib-refdir=../gnulib
+```
 
 Then configure the project as you would normally, for example:
 
-  ./configure --enable-java --enable-gtk-doc-pdf
+```
+./configure --enable-java --enable-gtk-doc-pdf
+```
 
 Then build the project:
 
-  make
-  make check
+```
+make
+make check
+```
 
 To prepare releases you need some additional tools:
 
@@ -83,9 +94,11 @@ To prepare releases you need some additional tools:
 - pmccabe (to produce cyclomatic code complexity report)
 - ncftpput (to upload source tarballs)
 
-gNewSense/Debian/Ubuntu:
+APT/DPKG-based distributions:
+```
 apt-get install mingw-w64 wine binfmt-support lcov zip
 apt-get install clang doxygen pmccabe ncftp
+```
 
 See README-release on how to make a release.
 

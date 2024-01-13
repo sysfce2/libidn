@@ -130,42 +130,66 @@ AC_ARG_ENABLE([asan],
   ])
 
 AC_ARG_ENABLE([gcc-warnings],
-  [AS_HELP_STRING([--enable-gcc-warnings],
-		  [turn on lots of GCC warnings (for developers)])],
-  [case $enableval in
-     yes|no) ;;
-     *)      AC_MSG_ERROR([bad value $enableval for gcc-warnings option]) ;;
-   esac
-   gl_gcc_warnings=$enableval],
-  [gl_gcc_warnings=yes]
-)
+  [AS_HELP_STRING([[--enable-gcc-warnings[=TYPE]]],
+    [control generation of GCC warnings.  The TYPE 'no' disables
+     warnings; 'yes' (default) generates cheap warnings;
+     'expensive' in addition generates expensive warnings
+     and 'error' also turn warnings into errors.])])
 
-if test "$gl_gcc_warnings" = yes; then
-  gl_WARN_ADD([-Wframe-larger-than=160], [WSTACK_CFLAGS])
+# https://www.gnu.org/software/gnulib//manual/html_node/manywarnings.html
+AS_IF([test "$enable_gcc_warnings" != no],
+  [
+   # Set up the list of unwanted warning options.
+   nw=
+   if test "$enable_gcc_warnings" = yes; then
+     nw="$nw -fanalyzer"
+   fi
+   nw="$nw -Wbad-function-cast" # Casting a function's result is not more
+                                # dangerous than casting any other value.
+   nw="$nw -Winline"            # It's OK to not inline.
+   nw="$nw -Wsign-compare"      # Too many false alarms.
+   nw="$nw -Wstrict-overflow"   # It's OK to optimize strictly.
+   nw="$nw -Wsystem-headers"    # Don't warn in system headers.
 
-  nw="$nw -Wsystem-headers"         # Don't let system headers trigger warnings
-  nw="$nw -Wpadded"                 # Struct in src/idn_cmd.h is not padded
-  nw="$nw -Wformat"                 # Self tests and examples print size_t as %d
-  nw="$nw -Wc++-compat"             # We don't care strongly about C++ compilers
-  nw="$nw -Woverlength-strings"     # Some of our strings are too large
-  nw="$nw -Wsign-conversion"        # Too many warnings for now
-  nw="$nw -Wconversion"             # Too many warnings for now
-  nw="$nw -Wtraditional"            # Warns on #elif which we use often
-  nw="$nw -Wtraditional-conversion" # Too many warnings for now
-  nw="$nw -Wmissing-noreturn"       # Too many warnings for now
-  nw="$nw -Wunreachable-code"       # Too many false positives
-  nw="$nw -Wlogical-op"             # Too many false positives
-  nw="$nw -Wsuggest-attribute=pure" # Is it worth using attributes?
-  nw="$nw -Wsuggest-attribute=const" # Is it worth using attributes?
+   nw="$nw -Wsuggest-attribute=pure"  # Is it worth using attributes?
+   nw="$nw -Wsuggest-attribute=const" # Is it worth using attributes?
+   nw="$nw -Wmissing-field-initializers" # We use missing fields = 0 a lot
+   gl_WARN_ADD([-Wframe-larger-than=208], [WARN_LIB_CFLAGS])
 
-  gl_MANYWARN_ALL_GCC([ws])
-  gl_MANYWARN_COMPLEMENT(ws, [$ws], [$nw])
-  for w in $ws; do
-    gl_WARN_ADD([$w])
-  done
+   if test "$enable_gcc_warnings" = error; then
+     gl_WARN_ADD([-Werror], [WERROR_CFLAGS])
+     gl_WARN_ADD([-Wno-error=suggest-attribute=malloc], [WERROR_CFLAGS])
+     gl_WARN_ADD([-Wno-error=overlength-strings], [WERROR_CFLAGS])
+     gl_WARN_ADD([-Wno-error=analyzer-out-of-bounds], [WERROR_CFLAGS])
+   fi
 
-  gl_WARN_ADD([-Wno-missing-field-initializers]) # Rely on missing field = 0.
-fi
+   # Setup the list of meaningful warning options for the C compiler.
+   # The list comes from manywarnings.m4. Warning options that are not
+   # generally meaningful have already been filtered out (cf.
+   # build-aux/gcc-warning.spec).
+   gl_MANYWARN_ALL_GCC([possible_warning_options])
+
+   # Compute the list of warning options that are desired.
+   gl_MANYWARN_COMPLEMENT([desired_warning_options],
+                          [$possible_warning_options], [$nw])
+   # Compute the list of remaining undesired warning options.
+   # Namely those, that were not in manywarnings.m4 because they were
+   # already listed in build-aux/gcc-warning.spec; this includes those
+   # that are implied by -Wall.
+   gl_MANYWARN_COMPLEMENT([remaining_undesired_warning_options],
+                          [$nw], [$possible_warning_options])
+
+   # Add the desired warning options to WARN_CFLAGS.
+   for w in $desired_warning_options; do
+     gl_WARN_ADD([$w])
+   done
+
+   # Add the opposites of the remaining undesired warning options to
+   # WARN_CFLAGS.
+   for w in `echo "$remaining_undesired_warning_options" | sed -e 's/-W/-Wno-/g'`; do
+     gl_WARN_ADD([$w])
+   done
+])
 
 AC_ARG_ENABLE(doc,
   AS_HELP_STRING([--disable-doc], [don't generate any documentation]),
@@ -208,27 +232,35 @@ AC_CONFIG_FILES([
 ])
 AC_OUTPUT
 
-AC_MSG_NOTICE([Summary of build options:
+AC_MSG_NOTICE([summary of main build options:
 
-  Version:           ${VERSION}
-  Libtool version    $LT_CURRENT:$LT_REVISION:$LT_AGE
-  DLL version:       $DLL_VERSION
-  Header version:    major $MAJOR_VERSION minor $MINOR_VERSION patch $PATCH_VERSION number $NUMBER_VERSION
-  Build/host system: ${build} / ${host}
-  Install prefix:    ${prefix}
-  Compiler:          ${CC}
-  Warning flags:     ${WARN_CFLAGS}
-  CFLAGS:            ${CFLAGS} ${CPPFLAGS}
-  LDFlags:           ${LDFLAGS}
-  Documentation:     ${enable_doc}
-  Library types:     Shared=${enable_shared}, Static=${enable_static}
-  nl_langinfo:       $gl_cv_header_langinfo_codeset
-  iconv:             $am_cv_func_iconv_summary $LTLIBICONV
-  Valgrind:          ${VALGRIND:-no}
-  Version script:    $have_ld_version_script
-  TLD code:          $enable_tld
-  Build Java port:   $enable_java
-  Build C# port:     $enable_csharp
-  Address Sanitizer: $asan
-  UB Sanitizer:      $ubsan
+  Version:            ${VERSION}
+  Libtool version     $LT_CURRENT:$LT_REVISION:$LT_AGE
+  DLL version:        $DLL_VERSION
+  Header version:     major $MAJOR_VERSION minor $MINOR_VERSION patch $PATCH_VERSION number $NUMBER_VERSION
+  Build system:       ${build}
+  Host/Target system: ${host}
+  Install prefix:     ${prefix}
+  Compiler:           ${CC}
+  CFLAGS:             ${CFLAGS}
+  CPPFLAGS:           ${CPPFLAGS}
+  LDFLAGS:            ${LDFLAGS}
+  Library types:      Shared=${enable_shared}, Static=${enable_static}
+
+  Warning flags:      $enable_gcc_warnings
+      WERROR_CFLAGS:  $WERROR_CFLAGS
+    WARN_LIB_CFLAGS:  $WARN_LIB_CFLAGS
+        WARN_CFLAGS:  $WARN_CFLAGS
+
+  Documentation:      ${enable_doc}
+  nl_langinfo:        $gl_cv_header_langinfo_codeset
+  iconv:              $am_cv_func_iconv_summary $LTLIBICONV
+  Version script:     $have_ld_version_script
+  TLD code:           $enable_tld
+  Build Java port:    $enable_java
+  Build C# port:      $enable_csharp
+  Address Sanitizer:  $asan
+  UB Sanitizer:       $ubsan
+
+  Valgrind:           $opt_valgrind_tests ${VALGRIND}
 ])

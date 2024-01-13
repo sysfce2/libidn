@@ -97,6 +97,8 @@ main (int argc, char **argv)
   const char *target = strrchr (argv[0], '/');
   target = target ? target + 1 : argv[0];
 
+  (void) argc;
+
   {
     int rc;
     char corporadir[sizeof (SRCDIR) + 1 + strlen (target) + 8];
@@ -134,7 +136,7 @@ __AFL_LOOP (int n)
 # endif
 
 int
-main (int argc, char **argv)
+main (void)
 {
   int ret;
   unsigned char buf[64 * 1024];

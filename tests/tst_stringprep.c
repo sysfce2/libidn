@@ -239,18 +239,16 @@ doit (void)
 	uint32_t *l;
 	char *x = NULL;
 	l = stringprep_utf8_to_ucs4 (strprep[i].in, -1, NULL);
-	if (l)
-	  x = stringprep_ucs4_to_utf8 (l, -1, NULL, NULL);
-	free (l);
-	if (i == 29)
-	  /* Ignoring known bad UTF-8 in entry 29 */
-	  continue;
-	else if (l == NULL)
+	if (l == NULL)
 	  {
-	    fail ("bad UTF-8 in entry %u\n", i);
+	    if (i != 29)
+	      /* Ignoring known bad UTF-8 in entry 29 */
+	      fail ("bad UTF-8 in entry %u\n", i);
 	    continue;
 	  }
-	else if (strcmp (strprep[i].in, x) != 0)
+	x = stringprep_ucs4_to_utf8 (l, -1, NULL, NULL);
+	free (l);
+	if (strcmp (strprep[i].in, x) != 0)
 	  {
 	    fail ("bad UTF-8 in entry %u\n", i);
 	    if (debug)

@@ -4,6 +4,13 @@ Libidn NEWS -- History of user-visible changes.                 -*- outline -*-
 
 ** Bump required gettext version to 0.19.8 for musl-libc.
 
+** Compiler warning improvements.
+As before, compiler warnings are enabled by default.  You may disable
+them using ./configure --disable-gcc-warnings or turn them into fatal
+errors using ./configure --enable-gcc-warnings=error to add -Werror
+and sensible -Wno-error='s.  Based on gnulib's manywarnings, see
+<https://www.gnu.org/software/gnulib//manual/html_node/manywarnings.html>.
+
 ** Updated translations.
 
 ** Update gnulib files and build fixes.

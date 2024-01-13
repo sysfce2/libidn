@@ -43,10 +43,10 @@ Q-Debian-testing:
   stage: quick
   script:
   - time ./bootstrap --skip-po
-  - time ./configure --disable-doc
+  - time ./configure --disable-doc --enable-gcc-warnings=error
   - time make -j$(nproc) syntax-check
-  - time make -j$(nproc) V=1
-  - time make -j$(nproc) check VERBOSE=t V=1
+  - time make -j$(nproc) -k V=1
+  - time make -j$(nproc) -k check VERBOSE=t V=1
   - git diff --exit-code # nothing should change version controlled files
 
 # https://docs.gitlab.com/ee/user/application_security/sast/#customizing-the-sast-settings
@@ -76,7 +76,7 @@ Coverity:
   - sha1sum /tmp/cov-analysis-linux64.tgz
   - tar xfz /tmp/cov-analysis-linux64.tgz
   - time ./bootstrap --skip-po
-  - time ./configure --enable-gcc-warnings --disable-doc CFLAGS="-g -Og"
+  - time ./configure --enable-gcc-warnings=error --disable-doc CFLAGS="-g -Og"
   - cov-analysis-linux64-*/bin/cov-build --dir cov-int make -j$(nproc) check
   - tar cfz cov-int.tar.gz cov-int
   - curl https://scan.coverity.com/builds?project=$COVERITY_SCAN_PROJECT_NAME
@@ -100,7 +100,7 @@ B-Alpine-arm64:
   - apk add gcc make libc-dev git autoconf automake libtool gettext-dev gperf gengetopt patch coreutils
   script:
   - time ./bootstrap --skip-po
-  - time ./configure --disable-doc
+  - time ./configure --disable-doc --enable-gcc-warnings=error
   - time make -j$(nproc) syntax-check
   - time make -j$(nproc) V=1
   - time make -j$(nproc) check V=1 VERBOSE=t
@@ -111,7 +111,7 @@ B-Debian9:
   stage: build
   script:
   - time ./bootstrap --skip-po
-  - time ./configure --enable-java
+  - time ./configure --enable-java --enable-gcc-warnings=error
   - time make -j$(nproc) check V=1 VERBOSE=t
   - time make -j$(nproc) dist
   - time make -j$(nproc) syntax-check
@@ -125,7 +125,7 @@ B-Debian12:
   - apt-get install -y -qq wget
   script:
   - time ./bootstrap
-  - time ./configure --enable-java
+  - time ./configure --enable-java --enable-gcc-warnings=error
   - time make -j$(nproc) syntax-check
   - time make -j$(nproc) check V=1 VERBOSE=t
   - time make -j$(nproc) dist
@@ -136,7 +136,7 @@ B-Debian-testing:
   stage: build
   script:
   - time ./bootstrap --skip-po
-  - time ./configure --enable-java
+  - time ./configure --enable-java --enable-gcc-warnings=error
   - time make -j$(nproc) check V=1 VERBOSE=t
   - time make -j$(nproc) distcheck
   - make -j$(nproc) install
@@ -151,7 +151,7 @@ B-Fedora-latest:
   stage: build
   script:
   - time ./bootstrap --skip-po
-  - time ./configure --enable-java
+  - time ./configure --enable-java --enable-gcc-warnings=error
   - time make -j$(nproc) check V=1 VERBOSE=t
   - time make -j$(nproc) distcheck
   - git diff --exit-code # nothing should change version controlled files
@@ -161,7 +161,7 @@ B-Trisquel11:
   stage: build
   script:
   - time ./bootstrap --skip-po
-  - time ./configure --enable-java
+  - time ./configure --enable-java --enable-gcc-warnings=error
   - time make -j$(nproc) check V=1 VERBOSE=t
   - time make -j$(nproc) dist
   - time make -j$(nproc) syntax-check
@@ -172,7 +172,7 @@ B-Ubuntu-latest:
   stage: build
   script:
   - time ./bootstrap --skip-po
-  - time ./configure --enable-java
+  - time ./configure --enable-java --enable-gcc-warnings=error
   - time make -j$(nproc) check V=1 VERBOSE=t
   - time make -j$(nproc) distcheck
   - git diff --exit-code # nothing should change version controlled files
@@ -190,13 +190,14 @@ B-MacOS14Xcode15:
     HOMEBREW_NO_INSTALL_UPGRADE: 1
     HOMEBREW_NO_INSTALL_CLEANUP: 1
     HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK: 1
+    WERROR_CFLAGS: "-Wno-error=format-nonliteral -Wno-error=format-security"
   before_script:
   - brew install autoconf automake libtool gengetopt help2man texinfo fig2dev
   script:
   - time ./bootstrap --skip-po
-  - time ./configure --enable-gcc-warnings
+  - time ./configure --enable-gcc-warnings=error
   - make -j$(nproc) syntax-check
-  - make -j$(nproc) check V=1 VERBOSE=t
+  - make -j$(nproc) check -k V=1 VERBOSE=t
   - git diff --exit-code # nothing should change version controlled files
 
 macOS13Xcode14:
@@ -207,14 +208,16 @@ macOS13Xcode14:
   tags: [ saas-macos-medium-m1 ]
   stage: test
   needs: [B-Trisquel11]
+  variables:
+    WERROR_CFLAGS: "-Wno-error=format-nonliteral -Wno-error=format-security"
   script:
   - gzip -cd libidn-*.tar.gz | tar xf -
   - cd `ls -d libidn-* | grep -v tar.gz`
   - mkdir b
   - cd b
-  - ../configure --enable-gcc-warnings
+  - ../configure --enable-gcc-warnings=error
   - make -j$(nproc) syntax-check
-  - make -j$(nproc) V=1 check VERBOSE=t
+  - make -j$(nproc) V=1 check -k VERBOSE=t
 
 B-clang:
   image: silkeh/clang:latest
@@ -226,7 +229,7 @@ B-clang:
   script:
   - clang --version
   - time ./bootstrap --skip-po
-  - time ./configure CC="clang -std=gnu2x" --enable-gcc-warnings --disable-doc
+  - time ./configure CC="clang -std=gnu2x" --enable-gcc-warnings=error --disable-doc
   - time make -j$(nproc) V=1
   - time make -j$(nproc) check V=1 VERBOSE=t
   - git diff --exit-code # nothing should change version controlled files
@@ -241,7 +244,7 @@ B-gcc:
   script:
   - gcc --version
   - time ./bootstrap --skip-po
-  - time ./configure CC="gcc -std=gnu2x" --enable-gcc-warnings --disable-doc
+  - time ./configure CC="gcc -std=gnu2x" --enable-gcc-warnings=error --disable-doc
   - time make -j$(nproc) V=1
   - time make -j$(nproc) syntax-check
   - time make -j$(nproc) check VERBOSE=t
@@ -265,7 +268,7 @@ B-Windows-UCRT64:
     C:\msys64\usr\bin\bash -lcx '
     pacman --noconfirm -Syu git autoconf automake libtool make mingw-w64-ucrt-x86_64-gcc gtk-doc help2man gengetopt gperf patch gettext-devel
     ./bootstrap --skip-po
-    ./configure --enable-gcc-warnings --disable-doc
+    ./configure --enable-gcc-warnings=error --disable-doc
     make -j$(nproc) V=1 -k check VERBOSE=t'
 
 Windows-MSYS:
@@ -289,7 +292,7 @@ Windows-MSYS:
     pacman --noconfirm -Syu make gcc
     tar xfa libidn-*.tar.gz
     cd `ls -d libidn-* | grep -v tar.gz`
-    ./configure --enable-gcc-warnings --disable-doc
+    ./configure --enable-gcc-warnings=error --disable-doc
     make -j$(nproc) V=1 -k check VERBOSE=t'
 
 Windows-MINGW64:
@@ -311,7 +314,7 @@ Windows-MINGW64:
     pacman --noconfirm -Syu make mingw-w64-x86_64-gcc
     tar xfa libidn-*.tar.gz
     cd `ls -d libidn-* | grep -v tar.gz`
-    ./configure --enable-gcc-warnings --disable-doc
+    ./configure --enable-gcc-warnings=error --disable-doc
     make -j$(nproc) V=1 -k check VERBOSE=t'
 
 AlmaLinux:
@@ -323,7 +326,7 @@ AlmaLinux:
   script:
   - tar xfa libidn-*.tar.gz
   - cd `ls -d libidn-* | grep -v tar.gz`
-  - time ./configure
+  - time ./configure --enable-gcc-warnings=error
   - time make -j$(nproc) check V=1 VERBOSE=t
 
 Alpine:
@@ -333,10 +336,12 @@ Alpine:
   before_script:
   - apk update
   - apk add build-base
+  variables:
+    WERROR_CFLAGS: "-Wno-error=unused-value -Wno-error=format-nonliteral -Wno-error=format-security"
   script:
   - tar xfz libidn-*.tar.gz
   - cd `ls -d libidn-* | grep -v tar.gz`
-  - time ./configure
+  - time ./configure --enable-gcc-warnings=error
   - time make -j$(nproc) check V=1 VERBOSE=t
 
 ArchLinux:
@@ -350,7 +355,7 @@ ArchLinux:
   - cd `ls -d libidn-* | grep -v tar.gz`
   - mkdir b
   - cd b
-  - time ../configure
+  - time ../configure --enable-gcc-warnings=error
   - time make -j$(nproc) check V=1 VERBOSE=t
 
 CentOS7:
@@ -362,7 +367,7 @@ CentOS7:
   script:
   - tar xfa libidn-*.tar.gz
   - cd `ls -d libidn-* | grep -v tar.gz`
-  - time ./configure
+  - time ./configure --enable-gcc-warnings=error
   - time make -j$(nproc) check V=1 VERBOSE=t
 
 Debian10:
@@ -377,7 +382,7 @@ Debian10:
   - cd `ls -d libidn-* | grep -v tar.gz`
   - mkdir b
   - cd b
-  - time ../configure
+  - time ../configure --enable-gcc-warnings=error
   - time make -j$(nproc) check V=1 VERBOSE=t
 
 Fedora-latest:
@@ -389,7 +394,7 @@ Fedora-latest:
   script:
   - tar xfz libidn-*.tar.gz
   - cd `ls -d libidn-* | grep -v tar.gz`
-  - time ./configure
+  - time ./configure --enable-gcc-warnings=error
   - time make -j$(nproc) check V=1 VERBOSE=t
 
 Ubuntu12.04:
@@ -403,7 +408,7 @@ Ubuntu12.04:
   script:
   - tar xfa libidn-*.tar.gz
   - cd `ls -d libidn-* | grep -v tar.gz`
-  - time ./configure
+  - time ./configure --enable-gcc-warnings=error
   - time make -j$(nproc) check V=1 VERBOSE=t
 
 Ubuntu14.04:
@@ -416,7 +421,7 @@ Ubuntu14.04:
   script:
   - tar xfa libidn-*.tar.gz
   - cd `ls -d libidn-* | grep -v tar.gz`
-  - time ./configure --disable-tld
+  - time ./configure --disable-tld --enable-gcc-warnings=error
   - time make -j$(nproc) check V=1 VERBOSE=t
 
 Ubuntu-rolling:
@@ -429,7 +434,7 @@ Ubuntu-rolling:
   script:
   - tar xfa libidn-*.tar.gz
   - cd `ls -d libidn-* | grep -v tar.gz`
-  - time ./configure
+  - time ./configure --enable-gcc-warnings=error
   - time make -j$(nproc) check V=1 VERBOSE=t
   - make -j$(nproc) distcheck
 
@@ -446,7 +451,7 @@ RockyLinux9-ppc64:
   script:
   - tar xfa libidn-*.tar.gz
   - cd `ls -d libidn-* | grep -v tar.gz`
-  - time ./configure --enable-gcc-warnings
+  - time ./configure --enable-gcc-warnings=error
   - time make -j$(nproc) check V=1 VERBOSE=t
 
 Mingw32:
@@ -458,13 +463,15 @@ Mingw32:
   - apt-get update -qq
   - apt-get install -y -qq make mingw-w64 wine wine32 libwine libwine:i386 binfmt-support wine-binfmt
   - update-binfmts --enable wine
+  variables:
+    WERROR_CFLAGS: "-Wno-error=unused-value -Wno-error=format-nonliteral -Wno-error=format-security -Wno-error=suggest-attribute=format -Wno-error=analyzer-use-of-uninitialized-value"
   script:
   - tar xfz libidn-*.tar.gz
   - cd `ls -d libidn-* | grep -v tar.gz`
   - mkdir b
   - cd b
-  - time ../configure --host=i686-w64-mingw32 CC='i686-w64-mingw32-gcc -static-libgcc'
-  - time make -j$(nproc) check V=1 VERBOSE=t
+  - time ../configure --enable-gcc-warnings=error --host=i686-w64-mingw32 CC='i686-w64-mingw32-gcc -static-libgcc'
+  - time make -k -j$(nproc) check V=1 VERBOSE=t
 
 Mingw64:
   image: debian:12-slim
@@ -474,13 +481,15 @@ Mingw64:
   - apt-get update -qq
   - apt-get install -y -qq make mingw-w64 wine wine64 binfmt-support wine-binfmt
   - update-binfmts --enable wine
+  variables:
+    WERROR_CFLAGS: "-Wno-error=unused-value -Wno-error=format-nonliteral -Wno-error=format-security -Wno-error=suggest-attribute=format -Wno-error=analyzer-use-of-uninitialized-value"
   script:
   - tar xfz libidn-*.tar.gz
   - cd `ls -d libidn-* | grep -v tar.gz`
   - mkdir b
   - cd b
-  - time ../configure --host=x86_64-w64-mingw32
-  - time make -j$(nproc) check V=1 VERBOSE=t
+  - time ../configure --enable-gcc-warnings=error --host=x86_64-w64-mingw32
+  - time make -k -j$(nproc) check V=1 VERBOSE=t
 
 Armcross:
   image: debian:12-slim
@@ -495,18 +504,18 @@ Armcross:
   - cd `ls -d libidn-* | grep -v tar.gz`
   - mkdir b
   - cd b
-  - ../configure --host=arm-linux-gnueabi CFLAGS="-static --static"
+  - ../configure --enable-gcc-warnings=error --host=arm-linux-gnueabi CFLAGS="-static --static"
   - make -j$(nproc) V=1
   - file src/idn
   - LANG=C.UTF-8 qemu-arm src/idn --debug foo
-  - time make -j$(nproc) check V=1 VERBOSE=t
+  - time make -k -j$(nproc) check V=1 VERBOSE=t
 
 .pages:
   image: $CI_REGISTRY/libidn/build-images:libidn-Debian-testing
   stage: build
   script:
   - time ./bootstrap --skip-po
-  - time ./configure --enable-java --enable-gtk-doc --enable-gtk-doc-pdf
+  - time ./configure --enable-gcc-warnings=error --enable-java --enable-gtk-doc --enable-gtk-doc-pdf
   - time make V=1
   - mkdir -p public
   - rm -rf public/reference

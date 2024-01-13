@@ -199,4 +199,5 @@
 /windows/tmp64
 Makefile
 Makefile.in
+TAGS
 doc/stamp-gdoc

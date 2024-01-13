@@ -189,7 +189,11 @@ main (int argc, char *argv[])
   do
     {
       if (cmdn < args_info.inputs_num)
-	line = strdup (args_info.inputs[cmdn++]);
+	{
+	  line = strdup (args_info.inputs[cmdn++]);
+	  if (!line)
+	    error (EXIT_FAILURE, errno, N_("strdup"));
+	}
       else if (getline (&line, &linelen, stdin) == -1)
 	{
 	  if (feof (stdin))

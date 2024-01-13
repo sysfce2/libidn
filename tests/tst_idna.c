@@ -284,7 +284,7 @@ doit (void)
       if (debug)
 	{
 	  printf ("expected out (%lu):\n",
-		  rc == IDNA_SUCCESS ? idna[i].inlen : len);
+		  (unsigned long) (rc == IDNA_SUCCESS ? idna[i].inlen : len));
 	  if (rc == IDNA_SUCCESS)
 	    ucs4print (idna[i].in, idna[i].inlen);
 	  else
