@@ -237,7 +237,6 @@ AC_MSG_NOTICE([summary of main build options:
   Version:            ${VERSION}
   Libtool version     $LT_CURRENT:$LT_REVISION:$LT_AGE
   DLL version:        $DLL_VERSION
-  Header version:     major $MAJOR_VERSION minor $MINOR_VERSION patch $PATCH_VERSION number $NUMBER_VERSION
   Build system:       ${build}
   Host/Target system: ${host}
   Install prefix:     ${prefix}
