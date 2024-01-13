@@ -469,7 +469,7 @@ g_ucs4_to_utf8 (const gunichar *str,
   gsize i;
 
   result_length = 0;
-  for (i = 0; len < 0 || i < len; i++)
+  for (i = 0; i < len; i++)
     {
       if (!str[i])
 	break;
