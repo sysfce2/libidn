@@ -22,6 +22,8 @@ AM_LDFLAGS = -no-install
 
 LDADD = libutils.a ../lib/libidn.la ../gl/libgnu.la
 
+EXTRA_DIST = standalone.sh
+
 check_LIBRARIES = libutils.a
 libutils_a_SOURCES = utils.h utils.c
 

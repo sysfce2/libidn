@@ -1,4 +1,4 @@
-/* tst_version.c --- Version number sanity checks.
+/* tst_version.c --- Libidn version number sanity checks.
  * Copyright (C) 2022-2024 Simon Josefsson
  *
  * This file is part of GNU Libidn.
@@ -22,48 +22,106 @@
 # include "config.h"
 #endif
 
-#include <stdio.h>
+#include <stdio.h>		/* printf */
+#include <stdlib.h>		/* EXIT_SUCCESS */
+#include <string.h>		/* strcmp */
 
 #include <stringprep.h>
 
-#include "utils.h"
-
-void
-doit (void)
+int
+main (void)
 {
-  if (debug)
+  const char *check_version_null;
+
+  printf ("STRINGPREP_VERSION: %s\n", STRINGPREP_VERSION);
+
+  check_version_null = stringprep_check_version (NULL);
+  if (!check_version_null)
     {
-      printf ("stringprep_check_version %s\n",
-	      stringprep_check_version (NULL));
-      printf ("STRINGPREP_VERSION %s\n", STRINGPREP_VERSION);
-#ifdef PACKAGE_VERSION
-      printf ("PACKAGE_VERSION %s\n", PACKAGE_VERSION);
-#endif
+      printf ("FAIL: stringprep_check_version (NULL)\n");
+      return EXIT_FAILURE;
     }
+  printf ("stringprep_check_version (NULL): %s\n", check_version_null);
+
+#ifdef PACKAGE_VERSION
+  printf ("PACKAGE_VERSION %s\n", PACKAGE_VERSION);
+
+  if (!stringprep_check_version (PACKAGE_VERSION))
+    {
+      printf ("FAIL: stringprep_check_version (PACKAGE_VERSION)\n");
+      return EXIT_FAILURE;
+    }
+#endif
 
   if (!stringprep_check_version (STRINGPREP_VERSION))
-    fail ("stringprep_check_version(STRINGPREP_VERSION) failed\n");
+    {
+      printf ("FAIL: stringprep_check_version (STRINGPREP_VERSION)\n");
+      return EXIT_FAILURE;
+    }
 
-  if (!stringprep_check_version (NULL))
-    fail ("stringprep_check_version(NULL) failed\n");
+  if (check_version_null != stringprep_check_version (NULL))
+    {
+      printf ("FAIL: check_version_null != "
+	      "stringprep_check_version (NULL)\n");
+      return EXIT_FAILURE;
+    }
 
-#ifdef PACKAGE_VERSION
-  if (!stringprep_check_version (PACKAGE_VERSION))
-    fail ("stringprep_check_version (PACKAGE_VERSION) == NULL\n");
-#endif
+  if (stringprep_check_version (STRINGPREP_VERSION) !=
+      stringprep_check_version (STRINGPREP_VERSION))
+    {
+      printf ("FAIL: stringprep_check_version (STRINGPREP_VERSION) "
+	      "!= stringprep_check_version (STRINGPREP_VERSION)\n");
+      return EXIT_FAILURE;
+    }
 
   if (!stringprep_check_version ("0.0"))
-    fail ("stringprep_check_version(\"0.0\") failed\n");
+    {
+      printf ("FAIL: stringprep_check_version(0.0)\n");
+      return EXIT_FAILURE;
+    }
 
   if (!stringprep_check_version ("1"))
-    fail ("stringprep_check_version(\"1\") failed\n");
+    {
+      printf ("FAIL: stringprep_check_version(1)\n");
+      return EXIT_FAILURE;
+    }
 
   if (!stringprep_check_version ("1.1"))
-    fail ("stringprep_check_version(\"1.1\") failed\n");
+    {
+      printf ("FAIL: stringprep_check_version(1.1)\n");
+      return EXIT_FAILURE;
+    }
+
+  if (!stringprep_check_version ("1.0.1"))
+    {
+      printf ("FAIL: stringprep_check_version (1.0.1)\n");
+      return EXIT_FAILURE;
+    }
+
+  if (strcmp (STRINGPREP_VERSION, check_version_null) != 0)
+    {
+      printf ("FAIL: strcmp (STRINGPREP_VERSION, "
+	      "stringprep_check_version (NULL))\n");
+      return EXIT_FAILURE;
+    }
 
   if (stringprep_check_version ("100.100"))
-    fail ("stringprep_check_version(\"100.100\") failed\n");
+    {
+      printf ("FAIL: stringprep_check_version(100.100)\n");
+      return EXIT_FAILURE;
+    }
 
-  if (!stringprep_check_version ("1.40"))
-    fail ("stringprep_check_version(\"1.40\") failed\n");
+  if (stringprep_check_version ("4711.42.23"))
+    {
+      printf ("FAIL: stringprep_check_version(4711.42.23)\n");
+      return EXIT_FAILURE;
+    }
+
+  if (stringprep_check_version ("UNKNOWN"))
+    {
+      printf ("FAIL: stringprep_check_version (UNKNOWN)\n");
+      return EXIT_FAILURE;
+    }
+
+  return EXIT_SUCCESS;
 }
