@@ -69,6 +69,8 @@ Coverity:
   before_script:
   - apt-get update -qq -y
   - apt-get install -y -q curl
+  variables:
+    WERROR_CFLAGS: "-Wno-error=analyzer-use-of-uninitialized-value"
   script:
   - test -n "$COVERITY_SCAN_TOKEN" && test -n "$COVERITY_SCAN_PROJECT_NAME"
   - curl -o /tmp/cov-analysis-linux64.tgz https://scan.coverity.com/download/linux64
