@@ -40,7 +40,6 @@
 #define gboolean int
 #define gchar char
 #define guchar unsigned char
-#define glong long
 #define gint int
 #define guint unsigned int
 #define gushort unsigned short
@@ -238,10 +237,10 @@ static const gchar *const g_utf8_skip = utf8_skip_data;
  *
  * Return value: the length of the string in characters
  **/
-static glong
+static gsize
 g_utf8_strlen (const gchar *p)
 {
-  glong len = 0;
+  gsize len = 0;
 
   g_return_val_if_fail (p != NULL, 0);
 
@@ -362,7 +361,7 @@ g_unichar_to_utf8 (gunichar c, gchar *outbuf)
  *               This value must be freed with g_free().
  **/
 static gunichar *
-g_utf8_to_ucs4_fast (const gchar *str, glong len, glong *items_written)
+g_utf8_to_ucs4_fast (const gchar *str, gssize len, gsize *items_written)
 {
   gunichar *result;
   gsize n_chars, i;
@@ -462,12 +461,12 @@ g_utf8_to_ucs4_fast (const gchar *str, glong len, glong *items_written)
  **/
 static gchar *
 g_ucs4_to_utf8 (const gunichar *str,
-		glong len, glong *items_read, glong *items_written)
+		gsize len, gsize *items_read, gsize *items_written)
 {
   gint result_length;
   gchar *result = NULL;
   gchar *p;
-  gint i;
+  gsize i;
 
   result_length = 0;
   for (i = 0; len < 0 || i < len; i++)
@@ -1016,7 +1015,7 @@ stringprep_utf8_to_ucs4 (const char *str, ssize_t len, size_t *items_written)
   if (u8_check ((const uint8_t *) str, n))
     return NULL;
 
-  return g_utf8_to_ucs4_fast (str, (glong) len, (glong *) items_written);
+  return g_utf8_to_ucs4_fast (str, len, items_written);
 }
 
 /**
@@ -1040,8 +1039,7 @@ char *
 stringprep_ucs4_to_utf8 (const uint32_t *str, ssize_t len,
 			 size_t *items_read, size_t *items_written)
 {
-  return g_ucs4_to_utf8 (str, len, (glong *) items_read,
-			 (glong *) items_written);
+  return g_ucs4_to_utf8 (str, len, items_read, items_written);
 }
 
 /**
