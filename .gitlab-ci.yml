@@ -148,7 +148,7 @@ B-Debian-testing:
   - time make -j$(nproc) distcheck
   - make -j$(nproc) install
   - apt-get install -y -qq man
-  - git clone --depth=1 https://salsa.debian.org/debian/libidn.git debian-libidn -b wip
+  - git clone --depth=1 https://salsa.debian.org/debian/libidn.git debian-libidn
   - debian-libidn/debian/tests/idn
   - debian-libidn/debian/tests/libidn
   - git diff --exit-code # nothing should change version controlled files
