@@ -19,7 +19,7 @@ ucrt/msvcrt libc.  Report and tiny patch by Francesco Pretto in
 ** tests: Added script tests/standalone.sh suitable for integrators.
 The main purpose is to test a system-installed libidn, suitable for
 distributor checking (a'la Debian's autopkgtest/debci).  It may also
-be used to test a newly built libidn outside the ususal 'make check'
+be used to test a newly built libidn outside the usual 'make check'
 infrastructure.  To check that your system libidn is working, invoke
 the script with `srcdir` as an environment variable indicating where
 it can be find the source code for libidn's tests/ directory (it will
