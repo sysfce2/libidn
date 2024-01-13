@@ -264,6 +264,8 @@ B-Windows-UCRT64:
   - when: manual
   tags: [ shared-windows, windows-1809 ]
   stage: build
+  variables:
+    WERROR_CFLAGS: "-Wno-error=unused-value -Wno-error=format-nonliteral -Wno-error=format-security -Wno-error=suggest-attribute=format -Wno-error=analyzer-use-of-uninitialized-value"
   script: # https://www.msys2.org/docs/ci/#other-systems
   - wget.exe -nv -O msys2.exe https://github.com/msys2/msys2-installer/releases/download/nightly-x86_64/msys2-base-x86_64-latest.sfx.exe
   - ./msys2.exe -y -oC:\
@@ -277,9 +279,9 @@ B-Windows-UCRT64:
     C:\msys64\usr\bin\bash -lcx '
     pacman --noconfirm -Syu git autoconf automake libtool make mingw-w64-ucrt-x86_64-gcc gtk-doc help2man gengetopt gperf patch gettext-devel
     ./bootstrap --skip-po
-    ./configure --enable-gcc-warnings=error --disable-doc WERROR_CFLAGS="-Wno-error=unused-value -Wno-error=format-nonliteral -Wno-error=format-security -Wno-error=suggest-attribute=format -Wno-error=analyzer-use-of-uninitialized-value" || echo FAIL: ./configure rc $?
-    make -j$(nproc) V=1 -k check VERBOSE=t
-    '
+    ./configure --enable-gcc-warnings=error --disable-doc
+    make -j$(nproc) V=1 -k check VERBOSE=t'
+  - C:\msys64\usr\bin\bash -lc 'grep ^PASS tests/tst_idna.log'
 
 Windows-MSYS:
   rules:
@@ -288,6 +290,8 @@ Windows-MSYS:
   tags: [ shared-windows, windows-1809 ]
   stage: test
   needs: [B-Trisquel11]
+  variables:
+    WERROR_CFLAGS: "-Wno-error=unused-value -Wno-error=attributes -Wno-error=format-nonliteral -Wno-error=format-security"
   script: # https://www.msys2.org/docs/ci/#other-systems
   - wget.exe -nv -O msys2.exe https://github.com/msys2/msys2-installer/releases/download/nightly-x86_64/msys2-base-x86_64-latest.sfx.exe
   - ./msys2.exe -y -oC:\
@@ -302,9 +306,9 @@ Windows-MSYS:
     pacman --noconfirm -Syu make gcc
     tar xfa libidn-*.tar.gz
     cd `ls -d libidn-* | grep -v tar.gz`
-    ./configure --enable-gcc-warnings=error --disable-doc WERROR_CFLAGS="-Wno-error=unused-value -Wno-error=attributes -Wno-error=format-nonliteral -Wno-error=format-security" || echo FAIL: ./configure rc $?
-    make -j$(nproc) V=1 -k check VERBOSE=t
-    '
+    ./configure --enable-gcc-warnings=error --disable-doc
+    make -j$(nproc) V=1 -k check VERBOSE=t'
+  - C:\msys64\usr\bin\bash -lc 'grep ^PASS tests/tst_idna.log'
 
 Windows-MINGW64:
   rules:
@@ -313,6 +317,8 @@ Windows-MINGW64:
   tags: [ shared-windows, windows-1809 ]
   stage: test
   needs: [B-Trisquel11]
+  variables:
+    WERROR_CFLAGS: "-Wno-error=unused-value -Wno-error=format-nonliteral -Wno-error=format-security -Wno-error=suggest-attribute=format -Wno-error=analyzer-use-of-uninitialized-value"
   script: # https://www.msys2.org/docs/ci/#other-systems
   - wget.exe -nv -O msys2.exe https://github.com/msys2/msys2-installer/releases/download/nightly-x86_64/msys2-base-x86_64-latest.sfx.exe
   - ./msys2.exe -y -oC:\
@@ -327,9 +333,9 @@ Windows-MINGW64:
     pacman --noconfirm -Syu make mingw-w64-x86_64-gcc
     tar xfa libidn-*.tar.gz
     cd `ls -d libidn-* | grep -v tar.gz`
-    ./configure --enable-gcc-warnings=error --disable-doc WERROR_CFLAGS="-Wno-error=unused-value -Wno-error=format-nonliteral -Wno-error=format-security -Wno-error=suggest-attribute=format -Wno-error=analyzer-use-of-uninitialized-value" || echo FAIL: ./configure rc $?
-    make -j$(nproc) V=1 -k check VERBOSE=t
-    '
+    ./configure --enable-gcc-warnings=error --disable-doc
+    make -j$(nproc) V=1 -k check VERBOSE=t'
+  - C:\msys64\usr\bin\bash -lc 'grep ^PASS tests/tst_idna.log'
 
 AlmaLinux:
   image: almalinux:8
@@ -343,20 +349,22 @@ AlmaLinux:
   - time ./configure --enable-gcc-warnings=error
   - time make -j$(nproc) check V=1 VERBOSE=t
 
-Alpine:
+Alpine-mold:
   image: alpine:latest
   stage: test
   needs: [B-Trisquel11]
   before_script:
   - apk update
-  - apk add build-base
+  - apk add build-base mold
   variables:
     WERROR_CFLAGS: "-Wno-error=unused-value -Wno-error=format-nonliteral -Wno-error=format-security"
   script:
   - tar xfz libidn-*.tar.gz
   - cd `ls -d libidn-* | grep -v tar.gz`
-  - time ./configure --enable-gcc-warnings=error
-  - time make -j$(nproc) check V=1 VERBOSE=t
+  - time ./configure --enable-gcc-warnings=error CC='cc -fuse-ld=mold'
+  - make -j$(nproc) check V=1 VERBOSE=t 2>&1 | tee build.log
+  - (! grep -E 'mold. warning' build.log)
+  - grep 'mold ' lib/.libs/libidn.so
 
 ArchLinux:
   image: archlinux:latest

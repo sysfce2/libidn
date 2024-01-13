@@ -15,7 +15,9 @@
 /INSTALL
 /README-release
 /aclocal.m4
+/autogen.sh
 /autom4te.cache/
+/autopull.sh
 /build-aux/
 /config.h
 /config.h.in
