@@ -199,8 +199,9 @@ B-MacOS14Xcode15:
     HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK: 1
     WERROR_CFLAGS: "-Wno-error=format-nonliteral -Wno-error=format-security"
   before_script:
-  - brew install autoconf automake libtool gengetopt help2man texinfo fig2dev
+  - brew install autoconf automake libtool gengetopt help2man texinfo fig2dev coreutils
   script:
+  - PATH="$HOMEBREW_PREFIX/opt/coreutils/libexec/gnubin:$PATH"; export PATH
   - time ./bootstrap --skip-po
   - time ./configure --enable-gcc-warnings=error
   - make -j$(nproc) syntax-check
