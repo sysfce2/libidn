@@ -254,7 +254,9 @@ B-gcc:
 
 # https://docs.gitlab.com/ee/ci/runners/saas/windows_saas_runner.html
 B-Windows-UCRT64:
-  when: manual # FAIL: tst_stringprep: stringprep() entry 0 failed: 201, FAIL: tst_idna: IDNA entry 0 failed: 1, FAIL: tst_idna2: IDNA2 entry 0 failed: 1, FAIL: tst_idna3: IDNA3[0] failed
+  rules:
+  - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  - when: manual
   tags: [ shared-windows, windows-1809 ]
   stage: build
   script: # https://www.msys2.org/docs/ci/#other-systems
@@ -298,7 +300,9 @@ Windows-MSYS:
     make -j$(nproc) V=1 -k check VERBOSE=t'
 
 Windows-MINGW64:
-  when: manual # FAIL: tst_stringprep: stringprep() entry 0 failed: 201
+  rules:
+  - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  - when: manual
   tags: [ shared-windows, windows-1809 ]
   stage: test
   needs: [B-Trisquel11]
