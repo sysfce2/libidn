@@ -20,13 +20,14 @@ SUBDIRS = gl lib/gl lib po src
 if ENABLE_DOC
 SUBDIRS += doc
 endif
-SUBDIRS += fuzz tests examples
+SUBDIRS += fuzz examples
 if JAVA
 SUBDIRS += java
 endif
 if CSHARP
 SUBDIRS += csharp
 endif
+SUBDIRS += tests
 
 EXTRA_DIST = cfg.mk maint.mk
 EXTRA_DIST += CONTRIBUTING.md
