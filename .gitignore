@@ -124,6 +124,7 @@
 /fuzz/libidn_*_fuzzer
 /fuzz/libidn_*_fuzzer.new/
 /gl/
+/gnulib/
 /gtk-doc.make
 /java/libidn-*.jar
 /java/pom.xml
