@@ -30,12 +30,12 @@
 #include <unistd.h>
 
 /* Gnulib headers. */
-#include "error.h"
+#include <error.h>
 #include "gettext.h"
 #define _(String) dgettext (PACKAGE, String)
 #define N_(String) gettext_noop (String)
-#include "progname.h"
-#include "version-etc.h"
+#include <progname.h>
+#include <version-etc.h>
 
 /* Libidn headers. */
 #include <stringprep.h>

@@ -37,6 +37,7 @@ exclude_file_name_regexp--sc_prohibit_empty_lines_at_EOF = ^fuzz/libidn_.*fuzzer
 exclude_file_name_regexp--sc_two_space_separator_in_usage = ^cfg.mk$$
 exclude_file_name_regexp--sc_prohibit_always_true_header_tests = ^lib/toutf8.c$$
 exclude_file_name_regexp--sc_indent = '^lib/\(gunibreak\|gunicomp\|gunidecomp\).h$$'
+exclude_file_name_regexp--sc_fsf_postal = ^(COPYINGv2|COPYING.LESSERv2)$$
 
 # maint.mk's public-submodule-commit breaks on shallow gnulib
 # https://lists.gnu.org/archive/html/bug-gnulib/2022-08/msg00040.html
