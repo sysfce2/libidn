@@ -70,7 +70,7 @@ static const Tld_table _tld_fr_override = {
 };
 
 /* Main array */
-const Tld_table *my_tld_tables[] = {
+static const Tld_table *my_tld_tables[] = {
   &_tld_fr_override,
   NULL
 };
