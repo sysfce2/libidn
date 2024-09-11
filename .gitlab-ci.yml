@@ -226,7 +226,7 @@ macOS13Xcode14:
     WERROR_CFLAGS: "-Wno-error=format-nonliteral -Wno-error=format-security"
   script:
   - gzip -cd libidn-*.tar.gz | tar xf -
-  - cd $(tar tfa libidn-*.tar.gz | head -n1)
+  - cd $(gzip -cd libidn-*.tar.gz | tar tf - | head -n1)
   - mkdir b
   - cd b
   - ../configure --enable-gcc-warnings=error
@@ -271,7 +271,7 @@ B-Windows-UCRT64:
   rules:
   - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
   - when: manual
-  tags: [ shared-windows, windows-1809 ]
+  tags: [ saas-windows-medium-amd64 ]
   stage: build
   variables:
     WERROR_CFLAGS: "-Wno-error=unused-value -Wno-error=format-nonliteral -Wno-error=format-security -Wno-error=suggest-attribute=format -Wno-error=analyzer-use-of-uninitialized-value"
@@ -296,11 +296,11 @@ Windows-MSYS:
   rules:
   - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
   - when: manual
-  tags: [ shared-windows, windows-1809 ]
+  tags: [ saas-windows-medium-amd64 ]
   stage: test
   needs: [B-Trisquel11]
   variables:
-    WERROR_CFLAGS: "-Wno-error=unused-value -Wno-error=attributes -Wno-error=format-nonliteral -Wno-error=format-security"
+    WERROR_CFLAGS: "-Wno-error=unused-value -Wno-error=attributes -Wno-error=format-nonliteral -Wno-error=format-security -Wno-error=analyzer-use-of-uninitialized-value"
   script: # https://www.msys2.org/docs/ci/#other-systems
   - wget.exe -nv -O msys2.exe https://github.com/msys2/msys2-installer/releases/download/nightly-x86_64/msys2-base-x86_64-latest.sfx.exe
   - ./msys2.exe -y -oC:\
@@ -323,7 +323,7 @@ Windows-MINGW64:
   rules:
   - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
   - when: manual
-  tags: [ shared-windows, windows-1809 ]
+  tags: [ saas-windows-medium-amd64 ]
   stage: test
   needs: [B-Trisquel11]
   variables:
