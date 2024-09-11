@@ -41,7 +41,7 @@ struct stringprep
   int rc;
 };
 
-const struct stringprep strprep[] = {
+static const struct stringprep strprep[] = {
   {"Map to nothing",
    "foo\xC2\xAD\xCD\x8F\xE1\xA0\x86\xE1\xA0\x8B"
    "bar" "\xE2\x80\x8B\xE2\x81\xA0" "baz\xEF\xB8\x80\xEF\xB8\x88"
