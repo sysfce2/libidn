@@ -17,13 +17,13 @@
 
 variables:
   GIT_DEPTH: 100
+  GNULIB_URL: https://gitlab.com/libidn/gnulib-mirror.git
 
 workflow:
   rules:
   - if: $CI_COMMIT_BRANCH
 
 stages:
- - quick
  - build
  - test
 
@@ -38,9 +38,11 @@ default:
     - ./config.h
     - ./**/*.log
 
-Q-Debian-testing:
+B-Debian-mini-testing:
   image: $CI_REGISTRY/libidn/build-images:libidn-mini-Debian-testing
-  stage: quick
+  stage: build
+  variables:
+    WERROR_CFLAGS: "-Wno-error=analyzer-use-of-uninitialized-value"
   script:
   - apt-get install -y libidn-dev | tail
   - env srcdir=tests tests/standalone.sh
@@ -57,7 +59,7 @@ Q-Debian-testing:
 
 # https://docs.gitlab.com/ee/user/application_security/sast/#customizing-the-sast-settings
 sast:
-  stage: quick
+  stage: build
   variables:
     SAST_EXCLUDED_PATHS: gnulib
 include:
@@ -141,6 +143,8 @@ B-Debian12:
 B-Debian-testing:
   image: $CI_REGISTRY/libidn/build-images:libidn-Debian-testing
   stage: build
+  variables:
+    WERROR_CFLAGS: "-Wno-error=analyzer-use-of-uninitialized-value"
   script:
   - time ./bootstrap --skip-po
   - time ./configure --enable-java --enable-gcc-warnings=error
@@ -156,6 +160,8 @@ B-Debian-testing:
 B-Fedora-latest:
   image: $CI_REGISTRY/libidn/build-images:libidn-Fedora-latest
   stage: build
+  variables:
+    WERROR_CFLAGS: "-Wno-error=analyzer-use-of-uninitialized-value"
   script:
   - time ./bootstrap --skip-po
   - time ./configure --enable-java --enable-gcc-warnings=error
@@ -220,7 +226,7 @@ macOS13Xcode14:
     WERROR_CFLAGS: "-Wno-error=format-nonliteral -Wno-error=format-security"
   script:
   - gzip -cd libidn-*.tar.gz | tar xf -
-  - cd `ls -d libidn-* | grep -v tar.gz`
+  - cd $(tar tfa libidn-*.tar.gz | head -n1)
   - mkdir b
   - cd b
   - ../configure --enable-gcc-warnings=error
@@ -245,6 +251,8 @@ B-clang:
 B-gcc:
   image: gcc:latest
   stage: build
+  variables:
+    WERROR_CFLAGS: "-Wno-error=analyzer-use-of-uninitialized-value"
   before_script:
   - gcc --version
   - apt-get update -qqy
@@ -306,7 +314,7 @@ Windows-MSYS:
     C:\msys64\usr\bin\bash -lcx '
     pacman --noconfirm -Syu make gcc
     tar xfa libidn-*.tar.gz
-    cd `ls -d libidn-* | grep -v tar.gz`
+    cd $(tar tfa libidn-*.tar.gz | head -n1)
     ./configure --enable-gcc-warnings=error --disable-doc
     make -j$(nproc) V=1 -k check VERBOSE=t'
   - C:\msys64\usr\bin\bash -lc 'grep ^PASS tests/tst_idna.log'
@@ -333,7 +341,7 @@ Windows-MINGW64:
     C:\msys64\usr\bin\bash -lcx '
     pacman --noconfirm -Syu make mingw-w64-x86_64-gcc
     tar xfa libidn-*.tar.gz
-    cd `ls -d libidn-* | grep -v tar.gz`
+    cd $(tar tfa libidn-*.tar.gz | head -n1)
     ./configure --enable-gcc-warnings=error --disable-doc
     make -j$(nproc) V=1 -k check VERBOSE=t'
   - C:\msys64\usr\bin\bash -lc 'grep ^PASS tests/tst_idna.log'
@@ -346,7 +354,7 @@ AlmaLinux:
   - dnf -y install make gcc diffutils valgrind
   script:
   - tar xfa libidn-*.tar.gz
-  - cd `ls -d libidn-* | grep -v tar.gz`
+  - cd $(tar tfa libidn-*.tar.gz | head -n1)
   - time ./configure --enable-gcc-warnings=error
   - time make -j$(nproc) check V=1 VERBOSE=t
 
@@ -361,7 +369,7 @@ Alpine-mold:
     WERROR_CFLAGS: "-Wno-error=unused-value -Wno-error=format-nonliteral -Wno-error=format-security"
   script:
   - tar xfz libidn-*.tar.gz
-  - cd `ls -d libidn-* | grep -v tar.gz`
+  - cd $(tar tfa libidn-*.tar.gz | head -n1)
   - time ./configure --enable-gcc-warnings=error CC='cc -fuse-ld=mold'
   - make -j$(nproc) check V=1 VERBOSE=t 2>&1 | tee build.log
   - (! grep -E 'mold. warning' build.log)
@@ -371,27 +379,68 @@ ArchLinux:
   image: archlinux:latest
   stage: test
   needs: [B-Trisquel11]
+  variables:
+    WERROR_CFLAGS: "-Wno-error=analyzer-use-of-uninitialized-value"
   before_script:
   - pacman -Syu --noconfirm make gcc diffutils
   script:
   - tar xfz libidn-*.tar.gz
-  - cd `ls -d libidn-* | grep -v tar.gz`
+  - cd $(tar tfa libidn-*.tar.gz | head -n1)
   - mkdir b
   - cd b
   - time ../configure --enable-gcc-warnings=error
   - time make -j$(nproc) check V=1 VERBOSE=t
 
-CentOS7:
-  image: centos:7
+OracleLinux7:
+  image: oraclelinux:7
   stage: test
   needs: [B-Trisquel11]
   before_script:
   - yum -y install make gcc diffutils valgrind
   script:
   - tar xfa libidn-*.tar.gz
-  - cd `ls -d libidn-* | grep -v tar.gz`
+  - cd $(tar tfa libidn-*.tar.gz | head -n1)
   - time ./configure --enable-gcc-warnings=error
   - time make -j$(nproc) check V=1 VERBOSE=t
+
+Debian3:
+  image: debian/eol:woody
+  stage: test
+  needs: [B-Trisquel11]
+  before_script:
+  - apt-get update
+  - apt-get install -y -qq make gcc libc-dev
+  script:
+  - tar xfz libidn-*.tar.gz
+  - cd $(tar tfz libidn-*.tar.gz | head -n1)
+  - time ./configure --enable-gcc-warnings
+  - time make check V=1 VERBOSE=t
+
+Debian3.1:
+  image: debian/eol:sarge
+  stage: test
+  needs: [B-Trisquel11]
+  before_script:
+  - apt-get update
+  - apt-get install -y -qq make gcc libc-dev
+  script:
+  - tar xfz libidn-*.tar.gz
+  - cd $(tar tfz libidn-*.tar.gz | head -n1)
+  - time ./configure --enable-gcc-warnings=error
+  - time make check V=1 VERBOSE=t
+
+Debian4:
+  image: debian/eol:etch
+  stage: test
+  needs: [B-Trisquel11]
+  before_script:
+  - apt-get update
+  - apt-get install -y -qq make gcc libc-dev
+  script:
+  - tar xfz libidn-*.tar.gz
+  - cd $(tar tfz libidn-*.tar.gz | head -n1)
+  - time ./configure --enable-gcc-warnings=error
+  - time make check V=1 VERBOSE=t
 
 Debian10:
   image: debian:10-slim
@@ -402,7 +451,7 @@ Debian10:
   - apt-get install -y -qq make gcc
   script:
   - tar xfz libidn-*.tar.gz
-  - cd `ls -d libidn-* | grep -v tar.gz`
+  - cd $(tar tfa libidn-*.tar.gz | head -n1)
   - mkdir b
   - cd b
   - time ../configure --enable-gcc-warnings=error
@@ -412,11 +461,13 @@ Fedora-latest:
   image: fedora:latest
   stage: test
   needs: [B-Trisquel11]
+  variables:
+    WERROR_CFLAGS: "-Wno-error=analyzer-use-of-uninitialized-value"
   before_script:
   - dnf -y install make gcc diffutils valgrind
   script:
   - tar xfz libidn-*.tar.gz
-  - cd `ls -d libidn-* | grep -v tar.gz`
+  - cd $(tar tfa libidn-*.tar.gz | head -n1)
   - time ./configure --enable-gcc-warnings=error
   - time make -j$(nproc) check V=1 VERBOSE=t
 
@@ -430,7 +481,7 @@ Ubuntu12.04:
   - apt-get install -y -qq make gcc valgrind
   script:
   - tar xfa libidn-*.tar.gz
-  - cd `ls -d libidn-* | grep -v tar.gz`
+  - cd $(tar tfa libidn-*.tar.gz | head -n1)
   - time ./configure --enable-gcc-warnings=error
   - time make -j$(nproc) check V=1 VERBOSE=t
 
@@ -443,7 +494,7 @@ Ubuntu14.04:
   - apt-get install -y -qq make gcc valgrind
   script:
   - tar xfa libidn-*.tar.gz
-  - cd `ls -d libidn-* | grep -v tar.gz`
+  - cd $(tar tfa libidn-*.tar.gz | head -n1)
   - time ./configure --disable-tld --enable-gcc-warnings=error
   - time make -j$(nproc) check V=1 VERBOSE=t
 
@@ -456,7 +507,7 @@ Ubuntu-rolling:
   - apt-get install -y -qq git make gcc valgrind gtk-doc-tools texinfo texlive texlive-plain-generic
   script:
   - tar xfa libidn-*.tar.gz
-  - cd `ls -d libidn-* | grep -v tar.gz`
+  - cd $(tar tfa libidn-*.tar.gz | head -n1)
   - time ./configure --enable-gcc-warnings=error
   - time make -j$(nproc) check V=1 VERBOSE=t
   - make -j$(nproc) distcheck
@@ -473,7 +524,7 @@ RockyLinux9-ppc64:
   - dnf -y install make gcc valgrind
   script:
   - tar xfa libidn-*.tar.gz
-  - cd `ls -d libidn-* | grep -v tar.gz`
+  - cd $(tar tfa libidn-*.tar.gz | head -n1)
   - time ./configure --enable-gcc-warnings=error
   - time make -j$(nproc) check V=1 VERBOSE=t
 
@@ -490,7 +541,7 @@ Mingw32:
     WERROR_CFLAGS: "-Wno-error=unused-value -Wno-error=format-nonliteral -Wno-error=format-security -Wno-error=suggest-attribute=format -Wno-error=analyzer-use-of-uninitialized-value"
   script:
   - tar xfz libidn-*.tar.gz
-  - cd `ls -d libidn-* | grep -v tar.gz`
+  - cd $(tar tfa libidn-*.tar.gz | head -n1)
   - mkdir b
   - cd b
   - time ../configure --enable-gcc-warnings=error --host=i686-w64-mingw32 CC='i686-w64-mingw32-gcc -static-libgcc'
@@ -508,7 +559,7 @@ Mingw64:
     WERROR_CFLAGS: "-Wno-error=unused-value -Wno-error=format-nonliteral -Wno-error=format-security -Wno-error=suggest-attribute=format -Wno-error=analyzer-use-of-uninitialized-value"
   script:
   - tar xfz libidn-*.tar.gz
-  - cd `ls -d libidn-* | grep -v tar.gz`
+  - cd $(tar tfa libidn-*.tar.gz | head -n1)
   - mkdir b
   - cd b
   - time ../configure --enable-gcc-warnings=error --host=x86_64-w64-mingw32
@@ -524,7 +575,7 @@ Armcross:
   - update-binfmts --enable qemu-arm
   script:
   - tar xfz libidn-*.tar.gz
-  - cd `ls -d libidn-* | grep -v tar.gz`
+  - cd $(tar tfa libidn-*.tar.gz | head -n1)
   - mkdir b
   - cd b
   - ../configure --enable-gcc-warnings=error --host=arm-linux-gnueabi CFLAGS="-static --static"
@@ -536,6 +587,8 @@ Armcross:
 .pages:
   image: $CI_REGISTRY/libidn/build-images:libidn-Debian-testing
   stage: build
+  variables:
+    WERROR_CFLAGS: "-Wno-error=analyzer-use-of-uninitialized-value"
   script:
   - time ./bootstrap --skip-po
   - time ./configure --enable-gcc-warnings=error --enable-java --enable-gtk-doc --enable-gtk-doc-pdf
