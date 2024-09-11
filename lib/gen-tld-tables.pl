@@ -54,6 +54,7 @@ foreach my $tldfile (@ARGV)
 }
 
 print "/* Main array */\n";
+print "extern const Tld_table *_tld_tables[];\n";
 print "const Tld_table * _tld_tables[] =\n";
 print "{\n";
 foreach (@tlds)
