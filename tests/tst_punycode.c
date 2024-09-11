@@ -40,7 +40,7 @@ struct punycode
   int rc;
 };
 
-const struct punycode punycode[] = {
+static const struct punycode punycode[] = {
   {
    "(A) Arabic (Egyptian)", 17,
    {
