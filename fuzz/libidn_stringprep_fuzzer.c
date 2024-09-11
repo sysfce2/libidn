@@ -37,6 +37,7 @@ LLVMFuzzerTestOneInput (const uint8_t *data, size_t size)
   char *out;
   uint32_t cp;
   size_t errpos;
+  const Tld_table *tld;
 
   if (size > 2048)
     return 0;
@@ -64,7 +65,7 @@ LLVMFuzzerTestOneInput (const uint8_t *data, size_t size)
 #ifdef WITH_TLD
   if (tld_get_z (label, &out) == TLD_SUCCESS)	/* internally calls tld_get_4() */
     idn_free (out);
-  const Tld_table *tld = tld_default_table ("fr", NULL);
+  tld = tld_default_table ("fr", NULL);
   tld_check_8z (label, &errpos, NULL);
   tld_check_lz (label, &errpos, NULL);
 #endif

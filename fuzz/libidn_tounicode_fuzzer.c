@@ -46,6 +46,7 @@ LLVMFuzzerTestOneInput (const uint8_t *data, size_t size)
     {
       uint32_t *u32 = (uint32_t *) malloc (size);
       size_t u32len;
+      uint32_t *data0, *out0;
 
       assert (u32 != NULL);
 
@@ -57,7 +58,7 @@ LLVMFuzzerTestOneInput (const uint8_t *data, size_t size)
 
       free (u32);
 
-      uint32_t *data0 = (uint32_t *) malloc (size + 4), *out0;
+      data0 = (uint32_t *) malloc (size + 4);
       assert (data0 != NULL);
       memcpy (data0, data, size);
       data0[size / 4] = 0;

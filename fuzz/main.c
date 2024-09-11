@@ -47,20 +47,27 @@ test_all_from (const char *dirname)
     {
       while ((dp = readdir (dirp)))
 	{
+	  char *fname = NULL;
+	  int fd;
+	  struct stat st;
+	  uint8_t *data;
+	  ssize_t n;
+
 	  if (*dp->d_name == '.')
 	    continue;
 
-	  char fname[strlen (dirname) + strlen (dp->d_name) + 2];
-	  snprintf (fname, sizeof (fname), "%s/%s", dirname, dp->d_name);
+	  if (asprintf (&fname, "%s/%s", dirname, dp->d_name) < 0)
+	    {
+	      fprintf (stderr, "malloc failure");
+	      continue;
+	    }
 
-	  int fd;
 	  if ((fd = open (fname, O_RDONLY)) == -1)
 	    {
 	      fprintf (stderr, "Failed to open %s (%d)\n", fname, errno);
 	      continue;
 	    }
 
-	  struct stat st;
 	  if (fstat (fd, &st) != 0)
 	    {
 	      fprintf (stderr, "Failed to stat %d (%d)\n", fd, errno);
@@ -68,8 +75,7 @@ test_all_from (const char *dirname)
 	      continue;
 	    }
 
-	  uint8_t *data = malloc (st.st_size);
-	  ssize_t n;
+	  data = malloc (st.st_size);
 	  if ((n = read (fd, data, st.st_size)) == st.st_size)
 	    {
 	      printf ("testing %llu bytes from '%s'\n",
