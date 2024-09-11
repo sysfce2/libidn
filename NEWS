@@ -4,6 +4,8 @@ Libidn NEWS -- History of user-visible changes.                 -*- outline -*-
 
 ** Fix self-check tst-version due to broken strverscmp on Windows/musl.
 
+** Update gnulib files and build fixes.
+
 * Noteworthy changes in release 1.42 (2024-01-13) [stable]
 
 ** Bump required gettext version to 0.19.8 for musl-libc.
