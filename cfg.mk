@@ -22,6 +22,7 @@ old_NEWS_hash = 08790cbc825916c81904d5fc00b0dd92
 bootstrap-tools = gnulib,autoconf,automake,libtoolize,make,makeinfo,help2man,gperf,gengetopt,gtkdocize,tar,gzip
 
 local-checks-to-skip = sc_GPL_version sc_prohibit_strcmp
+local-checks-to-skip += sc_prohibit_gnu_make_extensions
 local-checks-to-skip += sc_prohibit_have_config_h sc_require_config_h	\
 	sc_require_config_h_first
 VC_LIST_ALWAYS_EXCLUDE_REGEX = \
@@ -38,6 +39,8 @@ exclude_file_name_regexp--sc_two_space_separator_in_usage = ^cfg.mk$$
 exclude_file_name_regexp--sc_prohibit_always_true_header_tests = ^lib/toutf8.c$$
 exclude_file_name_regexp--sc_indent = '^lib/\(gunibreak\|gunicomp\|gunidecomp\).h$$'
 exclude_file_name_regexp--sc_fsf_postal = ^(COPYINGv2|COPYING.LESSERv2)$$
+
+TAR_OPTIONS += --mode=go+u,go-w --mtime=$(abs_top_srcdir)/NEWS
 
 # maint.mk's public-submodule-commit breaks on shallow gnulib
 # https://lists.gnu.org/archive/html/bug-gnulib/2022-08/msg00040.html

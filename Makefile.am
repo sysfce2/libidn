@@ -68,3 +68,37 @@ gen-ChangeLog:
 		{ rm -f $(distdir)/ChangeLog &&				\
 		  mv $(distdir)/cl-t $(distdir)/ChangeLog; }		\
 	fi
+
+dist-hook: mtime-NEWS-to-git-HEAD
+.PHONY: mtime-NEWS-to-git-HEAD
+mtime-NEWS-to-git-HEAD:
+	$(AM_V_GEN)if test -e $(srcdir)/.git \
+			&& command -v git > /dev/null; then \
+		touch -m -d @"$$(git log -1 --format=%ct)" $(srcdir)/NEWS; \
+	fi
+
+dist-hook: pot-CreationDate-to-mtime-NEWS
+.PHONY: pot-CreationDate-to-mtime-NEWS
+pot-CreationDate-to-mtime-NEWS: mtime-NEWS-to-git-HEAD
+	$(AM_V_GEN)$(SED) -e 's,POT-Creation-Date: .*\\n",POT-Creation-Date: '"$$(env LC_ALL=C stat --format=%y $(srcdir)/NEWS | cut -c1-16,31-)"'\\n",' < $(distdir)/po/$(PACKAGE).pot > $@.tmp
+	$(AM_V_at)if cmp $@.tmp $(distdir)/po/$(PACKAGE).pot; then \
+		rm -f $@.tmp; else mv $@.tmp $(distdir)/po/$(PACKAGE).pot; fi
+	-$(AM_V_at)cmp $(srcdir)/po/$(PACKAGE).pot \
+			$(distdir)/po/$(PACKAGE).pot || \
+		cp $(distdir)/po/$(PACKAGE).pot \
+			$(srcdir)/po/$(PACKAGE).pot
+
+dist-hook: srcdist
+.PHONY: srcdist
+srcdist:
+	$(AM_V_GEN)if test -e $(srcdir)/.git \
+			&& command -v git > /dev/null; then \
+	 cd $(srcdir) && \
+	   git archive --prefix=$(PACKAGE)-$$(git describe)/ \
+	       -o $(abs_builddir)/$(PACKAGE)-$$(git describe)-src.tar.gz HEAD; \
+	fi
+
+distclean-local: distclean-local-srcdist
+.PHONY: distclean-local-srcdist
+distclean-local-srcdist:
+	-rm -f $(builddir)/$(PACKAGE)-*-src.tar.gz
