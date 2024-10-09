@@ -172,6 +172,8 @@ B-Trisquel11:
   script:
   - time ./bootstrap --skip-po
   - time ./configure --enable-java --enable-gcc-warnings=error
+  - grep '^HAVE_DOTNET = $' Makefile > /dev/null
+  - grep '^HAVE_MONO = 1$' Makefile > /dev/null
   - time make -j$(nproc) syntax-check
   - time make -j$(nproc) check V=1 VERBOSE=t
   - time make -j$(nproc) distcheck
@@ -190,10 +192,12 @@ B-Ubuntu2204:
     DEBIAN_FRONTEND: noninteractive
   before_script:
   - apt-get update -qq
-  - apt-get install -qqy --no-install-recommends make git autoconf automake libtool gettext autopoint cvs texinfo texlive texlive-plain-generic texlive-extra-utils help2man gtk-doc-tools dblatex valgrind gengetopt transfig mono-mcs gperf default-jdk-headless patch
+  - apt-get install -qqy --no-install-recommends make git autoconf automake libtool gettext autopoint cvs texinfo texlive texlive-plain-generic texlive-extra-utils help2man gtk-doc-tools dblatex valgrind gengetopt transfig dotnet8 gperf default-jdk-headless patch
   script:
   - time ./bootstrap --skip-po
   - time ./configure --enable-java --enable-gcc-warnings=error
+  - grep '^HAVE_DOTNET = 1$' Makefile > /dev/null
+  - grep '^HAVE_MONO = $' Makefile > /dev/null
   - time make -j$(nproc) syntax-check
   - time make -j$(nproc) check V=1 VERBOSE=t
   - time make -j$(nproc) distcheck

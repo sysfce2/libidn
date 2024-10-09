@@ -26,6 +26,8 @@ The git version used on Debian 11, PureOS 10, Trisquel 11 and Ubuntu
 22.04 produce another identical tarball.  These two 'git archive'
 outputs are not the same, due to how Git works.
 
+** The C# Libidn.dll can now be built with .NET as well as Mono/SSCLI.
+
 ** Fix self-check tst-version due to broken strverscmp on Windows/musl.
 
 ** Update gnulib files and build fixes.
