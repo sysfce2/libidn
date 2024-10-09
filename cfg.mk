@@ -66,7 +66,7 @@ my-update-copyright:
 
 sc_codespell:
 	@if `which codespell > /dev/null`; then \
-		codespell -L te,ba,noe,nwe,mye,myu,tye,tim,ede,wich `git ls-files|egrep -v '^gnulib|doc/specifications/.*|doc/gdoc|fuzz/libidn_(stringprep|toascii|tounicode)_fuzzer.in/.*$$'`; \
+		codespell -L meu,bu,te,ba,noe,nwe,mye,myu,tye,tim,ede,wich `git ls-files|egrep -v '^gnulib|doc/specifications/.*|doc/gdoc|fuzz/libidn_(stringprep|toascii|tounicode)_fuzzer.in/.*$$'`; \
 	fi
 
 sc_libtool_version_bump:
