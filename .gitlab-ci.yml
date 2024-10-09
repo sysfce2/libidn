@@ -192,7 +192,7 @@ B-Ubuntu2204:
     DEBIAN_FRONTEND: noninteractive
   before_script:
   - apt-get update -qq
-  - apt-get install -qqy --no-install-recommends make git autoconf automake libtool gettext autopoint cvs texinfo texlive texlive-plain-generic texlive-extra-utils help2man gtk-doc-tools dblatex valgrind gengetopt transfig dotnet8 gperf default-jdk-headless patch
+  - apt-get install -qqy --no-install-recommends make git autoconf automake libtool gettext autopoint cvs texinfo texlive texlive-plain-generic texlive-extra-utils help2man gtk-doc-tools dblatex valgrind gengetopt transfig dotnet8 gperf default-jdk-headless patch codespell
   script:
   - time ./bootstrap --skip-po
   - time ./configure --enable-java --enable-gcc-warnings=error
