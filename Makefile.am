@@ -62,11 +62,11 @@ dist-hook: gen-ChangeLog
 
 .PHONY: gen-ChangeLog
 gen-ChangeLog:
-	$(AM_V_GEN)if test -d .git; then				\
-		$(top_srcdir)/build-aux/gitlog-to-changelog >		\
-			$(distdir)/cl-t &&				\
-		{ rm -f $(distdir)/ChangeLog &&				\
-		  mv $(distdir)/cl-t $(distdir)/ChangeLog; }		\
+	$(AM_V_GEN)if test -e .git; then			\
+	  LC_ALL=en_US.UTF-8 TZ=UTC0				\
+	    $(top_srcdir)/build-aux/gitlog-to-changelog		\
+	      > $(distdir)/ChangeLog.tmp &&			\
+	  mv -f $(distdir)/ChangeLog.tmp $(distdir)/ChangeLog;	\
 	fi
 
 dist-hook: mtime-NEWS-to-git-HEAD
