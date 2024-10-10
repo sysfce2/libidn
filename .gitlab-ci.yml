@@ -208,9 +208,47 @@ B-Ubuntu2204:
   - mv -v *.tar.* tar/$CI_JOB_NAME_SLUG/
   - mv tar/$CI_JOB_NAME_SLUG/*-src.tar.* tar/$CI_JOB_NAME_SLUG/src/
 
+B-Ubuntu2404-release:
+  image: ubuntu:24.04
+  tags: [ saas-linux-medium-amd64 ]
+  stage: build
+  except:
+    - tags # do-release-commit-and-tag: not on branch
+  before_script:
+  - apt-get update -qq
+  - apt-get install -qqy --no-install-recommends make git autoconf automake libtool gettext autopoint cvs texinfo texlive texlive-plain-generic texlive-extra-utils help2man gtk-doc-tools dblatex valgrind gengetopt transfig dotnet8 gperf default-jdk-headless patch codespell
+  script:
+  - time ./bootstrap --skip-po
+  - time ./configure --enable-java --enable-gcc-warnings=error --disable-silent-rules
+  - grep '^HAVE_DOTNET = 1$' Makefile > /dev/null
+  - grep '^HAVE_MONO = $' Makefile > /dev/null
+  - time make -j$(nproc) syntax-check
+  - time make -j$(nproc) check V=1 VERBOSE=t
+  - time make -j$(nproc) distcheck
+  - git status
+  - git diff --exit-code # nothing should change version controlled files
+  - apt-get install -y -q gpg gpgv
+  - gpg --batch --passphrase '' --quick-gen-key pipeline@example.org
+  - git checkout $CI_COMMIT_BRANCH
+  - git config user.email "pipeline@example.org"
+  - git config user.name "Pipeline Builder"
+  - git config user.signingkey pipeline@example.org
+  - sed -i '5i ** WARNING This release was prepared automatically with no testing.\n' NEWS
+  - sed -i -e 's,STRINGPREP_VERSION ".*",STRINGPREP_VERSION "17.42.23",' lib/stringprep.h
+  - git commit -m "Warn about automatic release." NEWS lib/stringprep.h
+  - make release-commit RELEASE='17.42.23 stable'
+  - make
+  - make release RELEASE='17.42.23 stable' V=1 VERBOSE=t
+  - cat -n ~/announce-*-17.42.23
+  - git diff --exit-code # nothing should change version controlled files
+  - sha256sum *.tar.*
+  - mkdir -pv tar/$CI_JOB_NAME_SLUG/src
+  - mv -v *.tar.* tar/$CI_JOB_NAME_SLUG/
+  - mv tar/$CI_JOB_NAME_SLUG/*-src.tar.* tar/$CI_JOB_NAME_SLUG/src/
+
 000-reproducibility:
   stage: test
-  needs: [ B-AlmaLinux8, B-AlmaLinux9, B-RockyLinux8, B-RockyLinux9, B-Trisquel11, B-Ubuntu2204, B-PureOS10, B-Debian11, B-Debian9, B-Debian12, B-Debian-testing, B-Fedora-latest, B-Ubuntu-latest ]
+  needs: [ B-AlmaLinux8, B-AlmaLinux9, B-RockyLinux8, B-RockyLinux9, B-Trisquel11, B-Ubuntu2204, B-PureOS10, B-Debian11, B-Debian9, B-Debian12, B-Debian-testing, B-Fedora-latest, B-Ubuntu-latest, B-Ubuntu2404-release ]
   script:
   - cd tar
   - sha256sum */*.tar.* */src/*.tar.* | sort
@@ -486,7 +524,7 @@ Windows-MINGW64:
     make -j$(nproc) V=1 -k check VERBOSE=t'
   - C:\msys64\usr\bin\bash -lc 'grep ^PASS tests/tst_idna.log'
 
-AlmaLinux:
+AlmaLinux8:
   image: almalinux:8
   stage: test
   needs: [B-Trisquel11]
